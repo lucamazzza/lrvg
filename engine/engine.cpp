@@ -7,14 +7,10 @@
  * @author	Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@student.supsi.ch]
  */
 
-// #INCLUDE //////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 #include "engine.h"
    
 #include <iostream>   
 #include <source_location>
-
-// RESERVED STRUCTURES ////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * @brief Base class reserved structure (using PIMPL/Bridge design pattern https://en.wikipedia.org/wiki/Opaque_pointer).
@@ -31,8 +27,6 @@ struct Eng::Base::Reserved
    Reserved() : initFlag{ false } 
    {}
 };
-
-// BODY OF CLASS Base ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 /**
  * Constructor.

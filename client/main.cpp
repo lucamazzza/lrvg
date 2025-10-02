@@ -8,7 +8,6 @@
  */
 
 #include "lrvg_engine.h"
-
 #include <iostream>
 
 /**
@@ -19,10 +18,6 @@
  */
 int main(int argc, char *argv[])
 {
-   // Credits:
-   std::cout << "Client application example, A. Peternier (C) SUPSI" << std::endl;
-   std::cout << std::endl;
-
    // Init engine:
    LRVGEngine::init("Hanoi", 800, 600);
 

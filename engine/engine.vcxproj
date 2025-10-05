@@ -83,9 +83,12 @@
     <ClCompile Include="engine.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="camera.h" />
     <ClInclude Include="common.h" />
     <ClInclude Include="engine.h" />
+    <ClInclude Include="light.h" />
     <ClInclude Include="material.h" />
+    <ClInclude Include="mesh.h" />
     <ClInclude Include="node.h" />
     <ClInclude Include="object.h" />
     <ClInclude Include="texture.h" />

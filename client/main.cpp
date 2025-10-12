@@ -9,7 +9,7 @@
 
 // #INCLUDE ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-#include "engine.h"
+#include "lrvg_engine.h"
 
 #include <iostream>
 
@@ -28,11 +28,13 @@ int main(int argc, char *argv[])
    std::cout << std::endl;
 
    // Init engine:
-   Eng::Base &eng = Eng::Base::getInstance();
-   eng.init();
+   LRVGEngine::init("Hanoi", 800, 600);
+
+   // Main loop:
+   LRVGEngine::run();
 
    // Release engine:
-   eng.free();
+   LRVGEngine::free();
 
    // Done:
    std::cout << "\n[application terminated]" << std::endl;

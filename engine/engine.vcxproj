@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="..\packages\freeglut.3.2.2.v140.1.0.0\build\freeglut.3.2.2.v140.props" Condition="Exists('..\packages\freeglut.3.2.2.v140.1.0.0\build\freeglut.3.2.2.v140.props')" />
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
       <Configuration>Debug</Configuration>
@@ -80,20 +81,35 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="engine.cpp" />
+    <ClCompile Include="lrvg_engine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="camera.h" />
     <ClInclude Include="common.h" />
-    <ClInclude Include="engine.h" />
+    <ClInclude Include="cube.h" />
+    <ClInclude Include="directional_light.h" />
+    <ClInclude Include="lrvg_engine.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="material.h" />
     <ClInclude Include="mesh.h" />
     <ClInclude Include="node.h" />
     <ClInclude Include="object.h" />
+    <ClInclude Include="ortho_camera.h" />
+    <ClInclude Include="perspective_camera.h" />
+    <ClInclude Include="point_light.h" />
+    <ClInclude Include="sphere.h" />
+    <ClInclude Include="spot_light.h" />
     <ClInclude Include="texture.h" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\freeglut.3.2.2.v140.1.0.0\build\freeglut.3.2.2.v140.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\freeglut.3.2.2.v140.1.0.0\build\freeglut.3.2.2.v140.props'))" />
+  </Target>
 </Project>

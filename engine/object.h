@@ -27,4 +27,6 @@ protected:
 	std::vector<std::shared_ptr<Object>> children;
 private:
 	static int next_id;
+	int id;
+	std::string name;
 };

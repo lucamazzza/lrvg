@@ -24,9 +24,9 @@
 #include <glm/glm.hpp>
 
 #include "common.h"
-//#include "object.h"
-//#include "camera.h"
-//#include "material.h"
+#include "object.h"
+#include "camera.h"
+#include "material.h"
 
 /**
  * @brief Base engine main class. This class is a singleton.
@@ -48,22 +48,22 @@ public:
 	static void swap_buffers();
 	static void stop();
 	static void quit();
-//	static std::shared_ptr<Object> get_scene();
-//	static void set_scene(const std::shared_ptr<Object> scene);
-//	static void set_active_camera(const std::shared_ptr<Camera> camera);
-//	static std::shared_ptr<Object> find_obj_by_name(const std::string name);
+	static std::shared_ptr<Object> get_scene();
+	static void set_scene(const std::shared_ptr<Object> scene);
+	static void set_active_camera(const std::shared_ptr<Camera> camera);
+	static std::shared_ptr<Object> find_obj_by_name(const std::string name);
 	static void set_screen_text(const std::string text);
 	static bool free();
 private: 
 	static void resize_callback(const int width, const int height);
-//	static std::vector<std::pair<std::shared_ptr<Object>, glm::mat4>> build_render_list(const std::shared_ptr<Object>, const glm::mat4 par_world_matrix);
-//	static std::shared_ptr<Object> find_obj_by_name(const std::string name, const std::shared_ptr<Object> root);
+	static std::vector<std::pair<std::shared_ptr<Object>, glm::mat4>> build_render_list(const std::shared_ptr<Object>, const glm::mat4 par_world_matrix);
+	static std::shared_ptr<Object> find_obj_by_name(const std::string name, const std::shared_ptr<Object> root);
 	static int window_id;
 	static int window_width;
 	static int window_height;
-//	static std::shared_ptr<Object> scene;
-//	static std::shared_ptr<Camera> active_camera;
-//	static std::shared_ptr<Material> shadow_material;
+	static std::shared_ptr<Object> scene;
+	static std::shared_ptr<Camera> active_camera;
+	static std::shared_ptr<Material> shadow_material;
 	static std::string screen_text;
 	static int frames;
 	static float fps;

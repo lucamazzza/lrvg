@@ -102,15 +102,6 @@ glm::vec3 ENG_API Node::get_rotation() const {
 }
 
 /**
- * Retrieves the scale of the node along the X, Y, and Z axes.
- * 
- * @return A glm::vec3 representing the scaling factors.
- */
-glm::vec3 ENG_API Node::get_scale() const {
-	return this->scale;
-}
-
-/**
  * Renders the node using the provided world transformation matrix.
  * This method sets the OpenGL model-view matrix to the given world matrix
  * and prepares the node for rendering. Derived classes should override this

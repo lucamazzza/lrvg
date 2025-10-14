@@ -68,7 +68,7 @@ ENG_API LRVGEngine::~LRVGEngine() {
 bool ENG_API LRVGEngine::init(const std::string window_title, const int window_width, const int window_height) {
    if (LRVGEngine::is_initialized_f)
    {
-      std::cout << "ERROR: engine already initialized" << std::endl;
+      ERROR("ERROR: engine already initialized");
       return false;
    }
    // Init GLUT
@@ -125,3 +125,9 @@ bool ENG_API LRVGEngine::free() {
    LRVGEngine::is_initialized_f = false;
    return true;
 }
+
+void ENG_API LRVGEngine::render() {}
+
+void ENG_API LRVGEngine::timer_callback(int val) {}
+
+void ENG_API LRVGEngine::resize_callback(const int height, const int width) {}

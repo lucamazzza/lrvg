@@ -1,6 +1,6 @@
 /**
  * @file	engine.cpp
- * @brief	Graphics engine main file
+ * @brief	Graphics Engine main file
  *
  * @author	Luca Mazza (C) SUPSI [luca.mazza@student.supsi.ch]
  * @author	Roeld Hoxha (C) SUPSI [roeld.hoxha@student.supsi.ch]
@@ -22,18 +22,18 @@
 #include <FreeImage.h>
 
 #include "common.h"
-//#include "material.h"
-//#include "mesh.h"
+#include "material.h"
+#include "mesh.h"
 
 bool LRVGEngine::is_initialized_f = false;
 bool LRVGEngine::is_running_f = false;
 int LRVGEngine::window_id = 0;
-//std::shared_ptr<Object> LRVGEngine::scene;
-//std::shared_ptr<Camera> LRVGEngine::active_camera;
-//std::string LRVGEngine::screen_text;
+std::shared_ptr<Object> LRVGEngine::scene;
+std::shared_ptr<Camera> LRVGEngine::active_camera;
+std::string LRVGEngine::screen_text;
 int LRVGEngine::window_width = 0;
 int LRVGEngine::window_height = 0;
-//std::shared_ptr<Material> LRVGEngine::shadow_material = std::make_shared<Material>();
+std::shared_ptr<Material> LRVGEngine::shadow_material = std::make_shared<Material>();
 
 // Frames:
 int LRVGEngine::frames = 0;
@@ -80,9 +80,9 @@ bool ENG_API LRVGEngine::init(const std::string window_title, const int window_w
    glutReshapeWindow(window_width, window_height);
    
    // Setup Callbacks
-   //glutDisplayFunc(render);
-   //glutReshapeFunc(resize_callback);
-   //glutTimerFunc(1000, timer_callback, 0);
+   glutDisplayFunc(render);
+   glutReshapeFunc(resize_callback);
+   glutTimerFunc(1000, timer_callback, 0);
 
    // OpenGL conf
    

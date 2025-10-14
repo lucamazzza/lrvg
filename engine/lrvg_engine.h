@@ -1,5 +1,5 @@
 /**
- * @file    engine.h
+ * @file    lrvg_engine.h
  * @brief	Graphics engine main include file
  *
  * @author	Luca Mazza (C) SUPSI [luca.mazza@student.supsi.ch]

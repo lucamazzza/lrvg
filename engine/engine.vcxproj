@@ -85,6 +85,7 @@
   <ItemGroup>
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="cube.cpp" />
+    <ClCompile Include="directional_light.cpp" />
     <ClCompile Include="light.cpp" />
     <ClCompile Include="lrvg_engine.cpp" />
     <ClCompile Include="material.cpp" />

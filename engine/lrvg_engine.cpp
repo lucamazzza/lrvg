@@ -35,7 +35,6 @@ int LRVGEngine::window_width = 0;
 int LRVGEngine::window_height = 0;
 std::shared_ptr<Material> LRVGEngine::shadow_material = std::make_shared<Material>();
 
-// Frames:
 int LRVGEngine::frames = 0;
 float LRVGEngine::fps = 0.0f;
 
@@ -199,6 +198,28 @@ void ENG_API LRVGEngine::resize_callback(const int height, const int width) {
 	glViewport(0, 0, width, height);
 }
 
+void ENG_API LRVGEngine::set_screen_text(const std::string text) {
+    LRVGEngine::screen_text = text;
+}
+
+std::shared_ptr<Object> ENG_API LRVGEngine::get_scene() {
+    return LRVGEngine::scene;
+}
+
+void ENG_API LRVGEngine::set_scene(const std::shared_ptr<Object> scene) {
+    LRVGEngine::scene = scene;
+	LRVGEngine::active_camera = nullptr;
+}
+
+void ENG_API LRVGEngine::set_active_camera(const std::shared_ptr<Camera> camera) {
+    if (LRVGEngine::active_camera != nullptr) {
+		LRVGEngine::active_camera->set_active(false);
+    }
+	camera->set_window_size(LRVGEngine::window_width, LRVGEngine::window_height);
+	camera->set_active(true);
+    LRVGEngine::active_camera = camera;
+}
+
 std::vector<std::pair<std::shared_ptr<Object>, glm::mat4>> LRVGEngine::build_render_list(const std::shared_ptr<Object> scene_root, const glm::mat4 parent_world_matrix) {
     std::vector<std::pair<std::shared_ptr<Object>, glm::mat4>> render_list;
     render_list.push_back(std::make_pair(scene_root, parent_world_matrix * scene_root->get_local_matrix()));
@@ -223,4 +244,25 @@ void ENG_API LRVGEngine::swap_buffers() {
 
 void ENG_API LRVGEngine::stop() {
     LRVGEngine::is_running_f = false;
+}
+
+std::shared_ptr<Object> ENG_API LRVGEngine::find_obj_by_name(const std::string name) {
+	const auto obj = LRVGEngine::find_obj_by_name(name, LRVGEngine::scene);
+    if (obj == nullptr) {
+        WARNING("object " << name << " not found");
+	}
+	return obj;
+}
+
+std::shared_ptr<Object> LRVGEngine::find_obj_by_name(const std::string name, const std::shared_ptr<Object> root) {
+    for (const auto& child : root->get_children()) {
+        if (child->get_name() == name) {
+            return child;
+        }
+		const auto found = LRVGEngine::find_obj_by_name(name, child);
+        if (found != nullptr) {
+            return found;
+		}
+    }
+	return nullptr;
 }

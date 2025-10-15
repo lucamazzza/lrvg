@@ -54,6 +54,12 @@
     <ClCompile Include="directional_light.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="spot_light.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="point_light.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="lrvg_engine.h">

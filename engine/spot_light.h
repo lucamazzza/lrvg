@@ -21,7 +21,7 @@ public:
 	void set_cutoff(const float cutoff);
 	void set_radius(const float radius);
 	void set_exponent(const float exponent);
-	void set_direction(const glm::mat4 world_matrix);
+	void set_direction(const glm::vec3 direction);
 	void render(const glm::mat4 world_matrix) const override;
 private:
 	float cutoff;

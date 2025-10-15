@@ -2,105 +2,49 @@
  * @file		engine.h
  * @brief	Graphics engine main include file
  *
- * @author	Achille Peternier (C) SUPSI [achille.peternier@supsi.ch] << change this to your group members
+ * @author	Luca Mazza (C) SUPSI [luca.mazza@supsi.ch]
+ * @author	Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@supsi.ch]
+ * @author	Roeld Hoxha (C) SUPSI [roeld.hoxha@supsi.ch]
  */
+
 #pragma once
+       
+#include <memory> 
 
-
- 
-//////////////
-// #INCLUDE //
-//////////////
-
-   // C/C++:         
-   #include <memory> 
-
-
-
-/////////////
-// VERSION //
-/////////////
-
-   // Generic info:
 #ifdef _DEBUG
-   #define LIB_NAME      "My Graphics Engine v0.1a (debug)"   ///< Library credits
+   #define LIB_NAME      "My Graphics Engine v0.1a (debug)"   
 #else
-   #define LIB_NAME      "My Graphics Engine v0.1a"   ///< Library credits
+   #define LIB_NAME      "My Graphics Engine v0.1a"   
 #endif
-   #define LIB_VERSION   10                           ///< Library version (divide by 10)
+   #define LIB_VERSION   10                 
 
-   // Export API:
 #ifdef _WINDOWS
-   // Specifies i/o linkage (VC++ spec):
    #ifdef ENGINE_EXPORTS
       #define ENG_API __declspec(dllexport)
    #else
       #define ENG_API __declspec(dllimport)
    #endif      
 
-   // Get rid of annoying warnings:
    #pragma warning(disable : 4251) 
-#else // Under linux
+#else
    #define ENG_API
 #endif
 
-
-
-///////////////
-// NAMESPACE //
-///////////////
-
 namespace Eng {
+   class ENG_API Base final
+   {
+   public: 
+      Base(Base const &) = delete;
+      ~Base();
+      void operator=(Base const &) = delete;
+      static Base &getInstance();
+      bool init();
+      bool free();   
 
-
-
-//////////////
-// #INCLUDE //
-//////////////   
-
-   // You can subinclude here other headers of your engine...
-
-
-
-///////////////////////
-// MAIN ENGINE CLASS //
-///////////////////////
-
-/**
- * @brief Base engine main class. This class is a singleton.
- */
-class ENG_API Base final
-{
-//////////
-public: //
-//////////	      
-
-   // Const/dest:
-   Base(Base const &) = delete;
-   ~Base();
-
-   // Operators:
-   void operator=(Base const &) = delete;
-
-   // Singleton:
-   static Base &getInstance();
-
-   // Init/free:
-   bool init();
-   bool free();   
-
-
-///////////
-private: //
-///////////	
-
-   // Reserved:
-   struct Reserved;
-   std::unique_ptr<Reserved> reserved;
-
-   // Const/dest:
-   Base();
-};
-
-}; // end of namespace Eng::
+   private:
+      struct Reserved;
+      std::unique_ptr<Reserved> reserved;
+      Base();
+   };
+}; 
 

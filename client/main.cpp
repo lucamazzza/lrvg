@@ -2,33 +2,14 @@
  * @file		main.cpp
  * @brief	Client application (that uses the graphics engine)
  *
- * @author	Achille Peternier (C) SUPSI [achille.peternier@supsi.ch] << change this to your group members
+ * @author	Luca Mazza (C) SUPSI [luca.mazza@supsi.ch]
+ * @author	Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@supsi.ch]
+ * @author	Roeld Hoxha (C) SUPSI [roeld.hoxha@supsi.ch]
  */
 
+#include "engine.h"
+#include <iostream>
 
-
-//////////////
-// #INCLUDE //
-//////////////
-
-   // Library header:
-   #include "engine.h"
-
-   // C/C++:
-   #include <iostream>
-
-
-
-//////////
-// MAIN //
-//////////
-
-/**
- * Application entry point.
- * @param argc number of command-line arguments passed
- * @param argv array containing up to argc passed arguments
- * @return error code (0 on success, error code otherwise)
- */
 int main(int argc, char *argv[])
 {
    // Credits:

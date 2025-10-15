@@ -27,7 +27,12 @@ int main(int argc, char *argv[])
    LRVGEngine::init("Hanoi", 800, 600);
 
    // Main loop:
-   LRVGEngine::run();
+   while (LRVGEngine::is_running()) {
+	  LRVGEngine::update();
+	  LRVGEngine::clear_screen();
+	  LRVGEngine::render();
+	  LRVGEngine::swap_buffers();
+   }
 
    // Release engine:
    LRVGEngine::free();

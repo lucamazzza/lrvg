@@ -54,8 +54,8 @@ public:
 	static std::shared_ptr<Object> find_obj_by_name(const std::string name);
 	static void set_screen_text(const std::string text);
 	static bool free();
+    static void resize_callback(const int width, const int height);
 private: 
-	static void resize_callback(const int width, const int height);
 	static std::vector<std::pair<std::shared_ptr<Object>, glm::mat4>> build_render_list(const std::shared_ptr<Object>, const glm::mat4 par_world_matrix);
 	static std::shared_ptr<Object> find_obj_by_name(const std::string name, const std::shared_ptr<Object> root);
 	static int window_id;

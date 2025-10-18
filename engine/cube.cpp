@@ -1,20 +1,69 @@
 #include "cube.h"
 
-#include <GL/freeglut.h>
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 
 #include "common.h"
 #include "mesh.h"
 
 /**
- * Renders a solid cube using GLUT's built-in function.
- * The cube is centered at the origin with a size of 1.0 unit.
- * 
- * This method is called automatically during the rendering process.
- * 
- * @param world_matrix The transformation matrix to apply to the cube before rendering.
+ * Construct a unit cube (centered at origin) as a Mesh by supplying vertices,
+ * indices (as triangle faces), normals and UVs to Mesh::set_mesh_data.
  */
-void ENG_API Cube::render(const glm::mat4 world_matrix) const {
+void Cube::render(const glm::mat4 world_matrix) const {
 	Mesh::render(world_matrix);
-	glutSolidCube(1.0f);
+}
+
+/**
+ * Creates a new instance of Cube with predefined mesh data.
+ * The cube is centered at the origin with a size of 1 unit in each dimension.
+ */
+Cube::Cube() {
+	std::vector<glm::vec3> vertices = {
+		{ -0.5f, -0.5f,  0.5f },
+		{  0.5f, -0.5f,  0.5f },
+		{  0.5f,  0.5f,  0.5f },
+		{ -0.5f,  0.5f,  0.5f },
+		{ -0.5f, -0.5f, -0.5f },
+		{  0.5f, -0.5f, -0.5f },
+		{  0.5f,  0.5f, -0.5f },
+		{ -0.5f,  0.5f, -0.5f }
+	};
+	std::vector<glm::vec3> normals(vertices.size());
+	for (size_t i = 0; i < normals.size(); ++i) normals[i] = glm::vec3(0.0f);
+	std::vector<glm::vec2> uvs = {
+		{0.0f, 0.0f},
+		{1.0f, 0.0f},
+		{1.0f, 1.0f},
+		{0.0f, 1.0f},
+		{0.0f, 0.0f},
+		{1.0f, 0.0f},
+		{1.0f, 1.0f},
+		{0.0f, 1.0f}
+	};
+	std::vector<std::tuple<uint32_t, uint32_t, uint32_t>> faces = {
+		{0, 1, 2}, {0, 2, 3},
+		{5, 4, 7}, {5, 7, 6},
+		{1, 5, 6}, {1, 6, 2},
+		{4, 0, 3}, {4, 3, 7},
+		{3, 2, 6}, {3, 6, 7},
+		{4, 5, 1}, {4, 1, 0}
+	};
+	for (const auto& f : faces) {
+		uint32_t i0 = std::get<0>(f);
+		uint32_t i1 = std::get<1>(f);
+		uint32_t i2 = std::get<2>(f);
+		glm::vec3 v0 = vertices[i0];
+		glm::vec3 v1 = vertices[i1];
+		glm::vec3 v2 = vertices[i2];
+		glm::vec3 face_normal = glm::normalize(glm::cross(v1 - v0, v2 - v0));
+		normals[i0] += face_normal;
+		normals[i1] += face_normal;
+		normals[i2] += face_normal;
+	}
+	for (auto& n : normals) {
+		n = glm::normalize(n);
+	}
+	this->set_mesh_data(vertices, faces, normals, uvs);
+	this->set_cast_shadows(true);
 }

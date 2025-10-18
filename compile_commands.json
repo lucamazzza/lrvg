@@ -1,0 +1,322 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-O2",
+      "-Wall",
+      "-I../dependencies/glad/include",
+      "-I../dependencies/glm/include",
+      "-I../dependencies/freeimage/include",
+      "-I/opt/homebrew/Cellar/glfw/3.4/include",
+      "-I/opt/homebrew/include",
+      "-c",
+      "-o",
+      "build/camera.o",
+      "camera.cpp"
+    ],
+    "directory": "/Users/lucamazza/projects/hanoi/engine",
+    "file": "/Users/lucamazza/projects/hanoi/engine/camera.cpp",
+    "output": "/Users/lucamazza/projects/hanoi/engine/build/camera.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-O2",
+      "-Wall",
+      "-I../dependencies/glad/include",
+      "-I../dependencies/glm/include",
+      "-I../dependencies/freeimage/include",
+      "-I/opt/homebrew/Cellar/glfw/3.4/include",
+      "-I/opt/homebrew/include",
+      "-c",
+      "-o",
+      "build/cube.o",
+      "cube.cpp"
+    ],
+    "directory": "/Users/lucamazza/projects/hanoi/engine",
+    "file": "/Users/lucamazza/projects/hanoi/engine/cube.cpp",
+    "output": "/Users/lucamazza/projects/hanoi/engine/build/cube.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-O2",
+      "-Wall",
+      "-I../dependencies/glad/include",
+      "-I../dependencies/glm/include",
+      "-I../dependencies/freeimage/include",
+      "-I/opt/homebrew/Cellar/glfw/3.4/include",
+      "-I/opt/homebrew/include",
+      "-c",
+      "-o",
+      "build/directional_light.o",
+      "directional_light.cpp"
+    ],
+    "directory": "/Users/lucamazza/projects/hanoi/engine",
+    "file": "/Users/lucamazza/projects/hanoi/engine/directional_light.cpp",
+    "output": "/Users/lucamazza/projects/hanoi/engine/build/directional_light.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-O2",
+      "-Wall",
+      "-I../dependencies/glad/include",
+      "-I../dependencies/glm/include",
+      "-I../dependencies/freeimage/include",
+      "-I/opt/homebrew/Cellar/glfw/3.4/include",
+      "-I/opt/homebrew/include",
+      "-c",
+      "-o",
+      "build/engine.o",
+      "engine.cpp"
+    ],
+    "directory": "/Users/lucamazza/projects/hanoi/engine",
+    "file": "/Users/lucamazza/projects/hanoi/engine/engine.cpp",
+    "output": "/Users/lucamazza/projects/hanoi/engine/build/engine.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-O2",
+      "-Wall",
+      "-I../dependencies/glad/include",
+      "-I../dependencies/glm/include",
+      "-I../dependencies/freeimage/include",
+      "-I/opt/homebrew/Cellar/glfw/3.4/include",
+      "-I/opt/homebrew/include",
+      "-c",
+      "-o",
+      "build/light.o",
+      "light.cpp"
+    ],
+    "directory": "/Users/lucamazza/projects/hanoi/engine",
+    "file": "/Users/lucamazza/projects/hanoi/engine/light.cpp",
+    "output": "/Users/lucamazza/projects/hanoi/engine/build/light.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-O2",
+      "-Wall",
+      "-I../dependencies/glad/include",
+      "-I../dependencies/glm/include",
+      "-I../dependencies/freeimage/include",
+      "-I/opt/homebrew/Cellar/glfw/3.4/include",
+      "-I/opt/homebrew/include",
+      "-c",
+      "-o",
+      "build/material.o",
+      "material.cpp"
+    ],
+    "directory": "/Users/lucamazza/projects/hanoi/engine",
+    "file": "/Users/lucamazza/projects/hanoi/engine/material.cpp",
+    "output": "/Users/lucamazza/projects/hanoi/engine/build/material.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-O2",
+      "-Wall",
+      "-I../dependencies/glad/include",
+      "-I../dependencies/glm/include",
+      "-I../dependencies/freeimage/include",
+      "-I/opt/homebrew/Cellar/glfw/3.4/include",
+      "-I/opt/homebrew/include",
+      "-c",
+      "-o",
+      "build/mesh.o",
+      "mesh.cpp"
+    ],
+    "directory": "/Users/lucamazza/projects/hanoi/engine",
+    "file": "/Users/lucamazza/projects/hanoi/engine/mesh.cpp",
+    "output": "/Users/lucamazza/projects/hanoi/engine/build/mesh.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-O2",
+      "-Wall",
+      "-I../dependencies/glad/include",
+      "-I../dependencies/glm/include",
+      "-I../dependencies/freeimage/include",
+      "-I/opt/homebrew/Cellar/glfw/3.4/include",
+      "-I/opt/homebrew/include",
+      "-c",
+      "-o",
+      "build/node.o",
+      "node.cpp"
+    ],
+    "directory": "/Users/lucamazza/projects/hanoi/engine",
+    "file": "/Users/lucamazza/projects/hanoi/engine/node.cpp",
+    "output": "/Users/lucamazza/projects/hanoi/engine/build/node.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-O2",
+      "-Wall",
+      "-I../dependencies/glad/include",
+      "-I../dependencies/glm/include",
+      "-I../dependencies/freeimage/include",
+      "-I/opt/homebrew/Cellar/glfw/3.4/include",
+      "-I/opt/homebrew/include",
+      "-c",
+      "-o",
+      "build/object.o",
+      "object.cpp"
+    ],
+    "directory": "/Users/lucamazza/projects/hanoi/engine",
+    "file": "/Users/lucamazza/projects/hanoi/engine/object.cpp",
+    "output": "/Users/lucamazza/projects/hanoi/engine/build/object.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-O2",
+      "-Wall",
+      "-I../dependencies/glad/include",
+      "-I../dependencies/glm/include",
+      "-I../dependencies/freeimage/include",
+      "-I/opt/homebrew/Cellar/glfw/3.4/include",
+      "-I/opt/homebrew/include",
+      "-c",
+      "-o",
+      "build/ortho_camera.o",
+      "ortho_camera.cpp"
+    ],
+    "directory": "/Users/lucamazza/projects/hanoi/engine",
+    "file": "/Users/lucamazza/projects/hanoi/engine/ortho_camera.cpp",
+    "output": "/Users/lucamazza/projects/hanoi/engine/build/ortho_camera.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-O2",
+      "-Wall",
+      "-I../dependencies/glad/include",
+      "-I../dependencies/glm/include",
+      "-I../dependencies/freeimage/include",
+      "-I/opt/homebrew/Cellar/glfw/3.4/include",
+      "-I/opt/homebrew/include",
+      "-c",
+      "-o",
+      "build/perspective_camera.o",
+      "perspective_camera.cpp"
+    ],
+    "directory": "/Users/lucamazza/projects/hanoi/engine",
+    "file": "/Users/lucamazza/projects/hanoi/engine/perspective_camera.cpp",
+    "output": "/Users/lucamazza/projects/hanoi/engine/build/perspective_camera.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-O2",
+      "-Wall",
+      "-I../dependencies/glad/include",
+      "-I../dependencies/glm/include",
+      "-I../dependencies/freeimage/include",
+      "-I/opt/homebrew/Cellar/glfw/3.4/include",
+      "-I/opt/homebrew/include",
+      "-c",
+      "-o",
+      "build/point_light.o",
+      "point_light.cpp"
+    ],
+    "directory": "/Users/lucamazza/projects/hanoi/engine",
+    "file": "/Users/lucamazza/projects/hanoi/engine/point_light.cpp",
+    "output": "/Users/lucamazza/projects/hanoi/engine/build/point_light.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-O2",
+      "-Wall",
+      "-I../dependencies/glad/include",
+      "-I../dependencies/glm/include",
+      "-I../dependencies/freeimage/include",
+      "-I/opt/homebrew/Cellar/glfw/3.4/include",
+      "-I/opt/homebrew/include",
+      "-c",
+      "-o",
+      "build/sphere.o",
+      "sphere.cpp"
+    ],
+    "directory": "/Users/lucamazza/projects/hanoi/engine",
+    "file": "/Users/lucamazza/projects/hanoi/engine/sphere.cpp",
+    "output": "/Users/lucamazza/projects/hanoi/engine/build/sphere.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-O2",
+      "-Wall",
+      "-I../dependencies/glad/include",
+      "-I../dependencies/glm/include",
+      "-I../dependencies/freeimage/include",
+      "-I/opt/homebrew/Cellar/glfw/3.4/include",
+      "-I/opt/homebrew/include",
+      "-c",
+      "-o",
+      "build/spot_light.o",
+      "spot_light.cpp"
+    ],
+    "directory": "/Users/lucamazza/projects/hanoi/engine",
+    "file": "/Users/lucamazza/projects/hanoi/engine/spot_light.cpp",
+    "output": "/Users/lucamazza/projects/hanoi/engine/build/spot_light.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-O2",
+      "-Wall",
+      "-I../dependencies/glad/include",
+      "-I../dependencies/glm/include",
+      "-I../dependencies/freeimage/include",
+      "-I/opt/homebrew/Cellar/glfw/3.4/include",
+      "-I/opt/homebrew/include",
+      "-c",
+      "-o",
+      "build/texture.o",
+      "texture.cpp"
+    ],
+    "directory": "/Users/lucamazza/projects/hanoi/engine",
+    "file": "/Users/lucamazza/projects/hanoi/engine/texture.cpp",
+    "output": "/Users/lucamazza/projects/hanoi/engine/build/texture.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/clang++",
+      "-std=c++20",
+      "-O2",
+      "-Wall",
+      "-I../dependencies/glad/include",
+      "-I../dependencies/glm/include",
+      "-I../dependencies/freeimage/include",
+      "-I/opt/homebrew/Cellar/glfw/3.4/include",
+      "-I/opt/homebrew/include",
+      "-c",
+      "-o",
+      "build/glad.o",
+      "../dependencies/glad/src/glad.c"
+    ],
+    "directory": "/Users/lucamazza/projects/hanoi/engine",
+    "file": "/Users/lucamazza/projects/hanoi/dependencies/glad/src/glad.c",
+    "output": "/Users/lucamazza/projects/hanoi/engine/build/glad.o"
+  }
+]

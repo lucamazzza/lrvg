@@ -1,6 +1,6 @@
 #include "light.h"
 
-#include <GL/freeglut.h>
+#include <glad/glad.h>
 
 #include "common.h"
 

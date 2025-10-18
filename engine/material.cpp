@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include <GL/freeglut.h>
+#include <glad/glad.h>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "texture.h"

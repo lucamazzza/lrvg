@@ -1,6 +1,6 @@
 #include "directional_light.h"
 
-#include <GL/freeglut.h>
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/string_cast.hpp>

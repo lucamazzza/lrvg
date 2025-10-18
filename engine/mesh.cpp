@@ -4,7 +4,7 @@
 #include <tuple>
 #include <vector>
 
-#include <GL/freeglut.h>
+#include <glad/glad.h>
 #include <glm/glm.hpp>
 
 #include "common.h"

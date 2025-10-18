@@ -1,25 +1,17 @@
-/**
- * @file	engine.cpp
- * @brief	Graphics Engine main file
- *
- * @author	Luca Mazza (C) SUPSI [luca.mazza@student.supsi.ch]
- * @author	Roeld Hoxha (C) SUPSI [roeld.hoxha@student.supsi.ch]
- * @author	Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@student.supsi.ch]
- */
+#include "engine.h"
 
-#include "lrvg_engine.h"
- 
 #include <algorithm>
 #include <memory>
 #include <string>
 #include <utility>
 #include <vector>
-#include <iostream>   
-#include <source_location>
+#include <iostream>
 
-#include <GL/freeglut.h>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <FreeImage.h>
+#include <source_location>
 
 #include "common.h"
 #include "material.h"
@@ -38,6 +30,12 @@ std::shared_ptr<Material> LRVGEngine::shadow_material = std::make_shared<Materia
 int LRVGEngine::frames = 0;
 float LRVGEngine::fps = 0.0f;
 
+static GLFWwindow* s_window = nullptr;
+static double s_last_fps_time = 0.0;
+static void (*s_keyboard_cb)(const unsigned char key, const int mouse_x, const int mouse_y) = nullptr;
+static void glfw_framebuffer_size_callback(GLFWwindow* window, int width, int height);
+static void glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
 #ifdef _WINDOWS
 #include <Windows.h>
 int APIENTRY DllMain(HANDLE instDLL, DWORD reason, LPVOID _reserved) {
@@ -51,45 +49,65 @@ int APIENTRY DllMain(HANDLE instDLL, DWORD reason, LPVOID _reserved) {
 }
 #endif
 
-/**
- * Destructor.
- */
 ENG_API LRVGEngine::~LRVGEngine() {
 #ifdef _DEBUG
     DEBUG(std::source_location::current().function_name() << " invoked" << std::endl);
 #endif
 }
 
-/**
- * Init internal components. 
- * @return TF
- */
-bool ENG_API LRVGEngine::init(const std::string window_title, const int window_width, const int window_height) {
+bool ENG_API LRVGEngine::init(const std::string window_title, const int width, const int height) {
    if (LRVGEngine::is_initialized_f) {
       ERROR("engine already initialized");
       return false;
    }
-   // Init GLUT
-   glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
-   int argc = 0;
-   glutInit(&argc, nullptr);
-   glutSetOption(GLUT_ACTION_ON_WINDOW_CLOSE, GLUT_ACTION_GLUTMAINLOOP_RETURNS);
-   LRVGEngine::window_id = glutCreateWindow(window_title.c_str());
-   glutReshapeWindow(window_width, window_height);
-   // Setup Callbacks
-   glutDisplayFunc(render);
-   glutReshapeFunc(resize_callback);
-   glutTimerFunc(1000, timer_callback, 0);
-   // OpenGL conf
+   if (!glfwInit()) {
+       ERROR("Failed to initialize GLFW");
+       return false;
+   }
+   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+   s_window = glfwCreateWindow(width, height, window_title.c_str(), nullptr, nullptr);
+   if (!s_window) {
+       ERROR("Failed to create GLFW window");
+       glfwTerminate();
+       return false;
+   }
+   glfwMakeContextCurrent(s_window);
+   glfwSwapInterval(1);
+   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+       ERROR("Failed to initialize GLAD");
+       glfwDestroyWindow(s_window);
+       glfwTerminate();
+       s_window = nullptr;
+       return false;
+   }
+   int fbw, fbh;
+   glfwGetFramebufferSize(s_window, &fbw, &fbh);
+   LRVGEngine::window_width = fbw;
+   LRVGEngine::window_height = fbh;
+   glViewport(0, 0, fbw, fbh);
+   glfwSetFramebufferSizeCallback(s_window, glfw_framebuffer_size_callback);
+   glfwSetKeyCallback(s_window, glfw_key_callback);
+#ifdef GL_DEPTH_TEST
    glEnable(GL_DEPTH_TEST);
+#endif
+#ifdef GL_NORMALIZE
    glEnable(GL_NORMALIZE);
+#endif
+#ifdef GL_LIGHTING
    glEnable(GL_LIGHTING);
+#endif
+#ifdef GL_CULL_FACE
    glEnable(GL_CULL_FACE);
-   // Lighting conf
+#endif
+
+#ifdef GL_LIGHT_MODEL_AMBIENT
    const glm::vec4 ambient(0.2f, 0.2f, 0.2f, 1.0f);
    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, glm::value_ptr(ambient));
+#endif
+#ifdef GL_LIGHT_MODEL_LOCAL_VIEWER
    glLightModelf(GL_LIGHT_MODEL_LOCAL_VIEWER, 1.0f);
-   // FreeImage init
+#endif
    FreeImage_Initialise();
    LRVGEngine::shadow_material->set_ambient_color(glm::vec3(0.0f, 0.0f, 0.0f));
    LRVGEngine::shadow_material->set_diffuse_color(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -98,11 +116,17 @@ bool ENG_API LRVGEngine::init(const std::string window_title, const int window_w
    DEBUG(LIB_NAME << " initialized");
    LRVGEngine::is_initialized_f = true;
    LRVGEngine::is_running_f = true;
+   s_last_fps_time = glfwGetTime();
+   LRVGEngine::frames = 0;
+   LRVGEngine::fps = 0.0f;
    return true;
 }
 
 void ENG_API LRVGEngine::set_keyboard_callback(void (*new_keyboard_callback) (const unsigned char key, const int mouse_x, const int mouse_y)) {
-    glutKeyboardFunc(new_keyboard_callback);
+    s_keyboard_cb = new_keyboard_callback;
+    if (s_window) {
+        glfwSetKeyCallback(s_window, glfw_key_callback);
+    }
 }
 
 void ENG_API LRVGEngine::set_sky_color(const float red, const float green, const float blue) {
@@ -114,23 +138,27 @@ bool ENG_API LRVGEngine::is_running() {
       ERROR("engine not initialized");
       return false;
    }
-   glutMainLoopEvent();
+   glfwPollEvents();
+   if (s_window && glfwWindowShouldClose(s_window)) {
+       LRVGEngine::is_running_f = false;
+   }
    return LRVGEngine::is_running_f;
 }
 
-/**
- * Free internal components.
- * @return TF
- */
 bool ENG_API LRVGEngine::free() {
    if (!LRVGEngine::is_initialized_f) {
       ERROR("engine not initialized");
       return false;
    }
    FreeImage_DeInitialise();
-   glutLeaveMainLoop();
+   if (s_window) {
+       glfwDestroyWindow(s_window);
+       s_window = nullptr;
+   }
+   glfwTerminate();
    DEBUG(LIB_NAME << " deinitialized");
    LRVGEngine::is_initialized_f = false;
+   LRVGEngine::is_running_f = false;
    return true;
 }
 
@@ -140,21 +168,27 @@ void ENG_API LRVGEngine::render() {
         return;
 	}
 	LRVGEngine::active_camera->set_window_size(LRVGEngine::window_width, LRVGEngine::window_height);
-    int max_lights;
+    int max_lights = 0;
+#ifdef GL_MAX_LIGHTS
 	glGetIntegerv(GL_MAX_LIGHTS, &max_lights);
 	DEBUG("Max lights: " << max_lights);
-    for (int i = 0; i < max_lights; i++) {
-        glDisable(GL_LIGHT0 + i);
-    }
+	for (int i = 0; i < max_lights; i++) {
+	    glDisable(GL_LIGHT0 + i);
+	}
+#endif
+
 	std::vector<std::pair<std::shared_ptr<Object>, glm::mat4>> render_list = LRVGEngine::build_render_list(LRVGEngine::scene, glm::mat4(1.0f));
-    std::sort(render_list.begin(), render_list.end(), [](const std::pair<std::shared_ptr<Object>, glm::mat4> a, const std::pair<std::shared_ptr<Object>, glm::mat4> b) {
+	std::sort(render_list.begin(), render_list.end(), [](const std::pair<std::shared_ptr<Object>, glm::mat4>& a, const std::pair<std::shared_ptr<Object>, glm::mat4>& b) {
         return a.first->get_priority() < b.first->get_priority();
 	});
 	const glm::mat4 inv_camera_matrix = glm::inverse(LRVGEngine::active_camera->get_local_matrix());
     for (const auto& node : render_list) {
 		node.first->render(inv_camera_matrix * node.second);
     }
+
+#ifdef GL_LEQUAL
     glDepthFunc(GL_LEQUAL);
+#endif
     const glm::mat4 shadow_model_scale_matrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 0.05f, 1.0f));
     for (const auto& node : render_list) {
 		std::shared_ptr<Mesh> mesh = std::dynamic_pointer_cast<Mesh>(node.first);
@@ -166,29 +200,37 @@ void ENG_API LRVGEngine::render() {
 			mesh->set_material(original_material);
         }
     }
+#ifdef GL_DEPTH_BUFFER_BIT
     glClear(GL_DEPTH_BUFFER_BIT);
+#endif
+#ifdef GL_LESS
 	glDepthFunc(GL_LESS);
+#endif
+#ifdef GL_PROJECTION
 	glMatrixMode(GL_PROJECTION);
+#endif
 	glLoadMatrixf(glm::value_ptr(glm::ortho(0.0f, (float)LRVGEngine::window_width, 0.0f, (float)LRVGEngine::window_height, -1.0f, 1.0f)));
+#ifdef GL_MODELVIEW
 	glMatrixMode(GL_MODELVIEW);
+#endif
 	glLoadMatrixf(glm::value_ptr(glm::mat4(1.0f)));
+
+#ifdef GL_LIGHTING
     glDisable(GL_LIGHTING);
+#endif
 	glColor3f(1.0f, 1.0f, 1.0f);
-    glRasterPos2f(16.0f, 5.0f);
-	std::string fps = "FPS: " + std::to_string((int)LRVGEngine::fps);
-	glutBitmapString(GLUT_BITMAP_8_BY_13, (unsigned char*)fps.c_str());
+	glRasterPos2f(16.0f, 5.0f);
+#ifdef GL_LIGHTING
     glEnable(GL_LIGHTING);
+#endif
     LRVGEngine::frames++;
 }
 
 void ENG_API LRVGEngine::timer_callback(int val) {
-    LRVGEngine::fps = LRVGEngine::frames;
-    LRVGEngine::frames = 0;
-    std::cout << "fps: " << LRVGEngine::fps << std::endl;
-    glutTimerFunc(1000, timer_callback, 0);
+    (void)val; 
 }
 
-void ENG_API LRVGEngine::resize_callback(const int height, const int width) {
+void ENG_API LRVGEngine::resize_callback(const int width, const int height) {
     LRVGEngine::window_width = width;
 	LRVGEngine::window_height = height;
 	DEBUG("Window resized to " << width << "x" << height);
@@ -231,7 +273,21 @@ std::vector<std::pair<std::shared_ptr<Object>, glm::mat4>> LRVGEngine::build_ren
 }
 
 void ENG_API LRVGEngine::update() {
-	glutMainLoopEvent();
+    if (!LRVGEngine::is_initialized_f) {
+       ERROR("engine not initialized");
+       return;
+    }
+
+    glfwPollEvents();
+
+    double now = glfwGetTime();
+    if (s_last_fps_time <= 0.0) s_last_fps_time = now;
+    if (now - s_last_fps_time >= 1.0) {
+        LRVGEngine::fps = (float)LRVGEngine::frames;
+        LRVGEngine::frames = 0;
+        s_last_fps_time = now;
+        std::cout << "fps: " << LRVGEngine::fps << std::endl;
+    }
 }
 
 void ENG_API LRVGEngine::clear_screen() {
@@ -239,11 +295,14 @@ void ENG_API LRVGEngine::clear_screen() {
 }
 
 void ENG_API LRVGEngine::swap_buffers() {
-    glutSwapBuffers();
+    if (s_window) {
+        glfwSwapBuffers(s_window);
+    }
 }
 
 void ENG_API LRVGEngine::stop() {
     LRVGEngine::is_running_f = false;
+    if (s_window) glfwSetWindowShouldClose(s_window, GLFW_TRUE);
 }
 
 std::shared_ptr<Object> ENG_API LRVGEngine::find_obj_by_name(const std::string name) {
@@ -265,4 +324,18 @@ std::shared_ptr<Object> LRVGEngine::find_obj_by_name(const std::string name, con
 		}
     }
 	return nullptr;
+}
+
+static void glfw_framebuffer_size_callback(GLFWwindow* /*window*/, int width, int height) {
+    LRVGEngine::resize_callback(width, height);
+}
+
+static void glfw_key_callback(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int /*mods*/) {
+    if (action != GLFW_PRESS) return;
+    if (!s_keyboard_cb) return;
+    const char* name = glfwGetKeyName(key, 0);
+    unsigned char ascii = (name && name[0]) ? (unsigned char)name[0] : (unsigned char)key;
+    double xpos = 0.0, ypos = 0.0;
+    if (s_window) glfwGetCursorPos(s_window, &xpos, &ypos);
+    s_keyboard_cb(ascii, (int)xpos, (int)ypos);
 }

@@ -7,7 +7,7 @@
  * @author	Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@student.supsi.ch]
  */
 
-#include "lrvg_engine.h"
+#include "engine.h"
 #include <iostream>
 
 /**

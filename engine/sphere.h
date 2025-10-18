@@ -17,5 +17,6 @@
  */
 class ENG_API Sphere : public Mesh {
 public:
+    Sphere(int lat_segments = 20, int lon_segments = 20);
 	void render(const glm::mat4 world_matrix) const override;
 };

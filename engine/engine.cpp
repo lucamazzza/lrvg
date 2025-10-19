@@ -12,6 +12,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <FreeImage.h>
 #include <source_location>
+#include <stb_easy_font.h>
 
 #include "common.h"
 #include "material.h"
@@ -88,26 +89,15 @@ bool ENG_API LRVGEngine::init(const std::string window_title, const int width, c
    glViewport(0, 0, fbw, fbh);
    glfwSetFramebufferSizeCallback(s_window, glfw_framebuffer_size_callback);
    glfwSetKeyCallback(s_window, glfw_key_callback);
-#ifdef GL_DEPTH_TEST
    glEnable(GL_DEPTH_TEST);
-#endif
-#ifdef GL_NORMALIZE
    glEnable(GL_NORMALIZE);
-#endif
-#ifdef GL_LIGHTING
    glEnable(GL_LIGHTING);
-#endif
-#ifdef GL_CULL_FACE
+   glEnable(GL_LIGHT0);
    glEnable(GL_CULL_FACE);
-#endif
-
-#ifdef GL_LIGHT_MODEL_AMBIENT
+   glShadeModel(GL_SMOOTH);
    const glm::vec4 ambient(0.2f, 0.2f, 0.2f, 1.0f);
    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, glm::value_ptr(ambient));
-#endif
-#ifdef GL_LIGHT_MODEL_LOCAL_VIEWER
    glLightModelf(GL_LIGHT_MODEL_LOCAL_VIEWER, 1.0f);
-#endif
    FreeImage_Initialise();
    LRVGEngine::shadow_material->set_ambient_color(glm::vec3(0.0f, 0.0f, 0.0f));
    LRVGEngine::shadow_material->set_diffuse_color(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -169,26 +159,21 @@ void ENG_API LRVGEngine::render() {
 	}
 	LRVGEngine::active_camera->set_window_size(LRVGEngine::window_width, LRVGEngine::window_height);
     int max_lights = 0;
-#ifdef GL_MAX_LIGHTS
 	glGetIntegerv(GL_MAX_LIGHTS, &max_lights);
-	DEBUG("Max lights: " << max_lights);
+	//DEBUG("Max lights: " << max_lights);
 	for (int i = 0; i < max_lights; i++) {
 	    glDisable(GL_LIGHT0 + i);
 	}
-#endif
-
-	std::vector<std::pair<std::shared_ptr<Object>, glm::mat4>> render_list = LRVGEngine::build_render_list(LRVGEngine::scene, glm::mat4(1.0f));
+	auto render_list = LRVGEngine::build_render_list(LRVGEngine::scene, glm::mat4(1.0f));
 	std::sort(render_list.begin(), render_list.end(), [](const std::pair<std::shared_ptr<Object>, glm::mat4>& a, const std::pair<std::shared_ptr<Object>, glm::mat4>& b) {
         return a.first->get_priority() < b.first->get_priority();
 	});
 	const glm::mat4 inv_camera_matrix = glm::inverse(LRVGEngine::active_camera->get_local_matrix());
     for (const auto& node : render_list) {
-		node.first->render(inv_camera_matrix * node.second);
+		node.first->render(node.second);
     }
 
-#ifdef GL_LEQUAL
     glDepthFunc(GL_LEQUAL);
-#endif
     const glm::mat4 shadow_model_scale_matrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 0.05f, 1.0f));
     for (const auto& node : render_list) {
 		std::shared_ptr<Mesh> mesh = std::dynamic_pointer_cast<Mesh>(node.first);
@@ -200,29 +185,15 @@ void ENG_API LRVGEngine::render() {
 			mesh->set_material(original_material);
         }
     }
-#ifdef GL_DEPTH_BUFFER_BIT
-    glClear(GL_DEPTH_BUFFER_BIT);
-#endif
-#ifdef GL_LESS
 	glDepthFunc(GL_LESS);
-#endif
-#ifdef GL_PROJECTION
+    glClear(GL_DEPTH_BUFFER_BIT);
 	glMatrixMode(GL_PROJECTION);
-#endif
 	glLoadMatrixf(glm::value_ptr(glm::ortho(0.0f, (float)LRVGEngine::window_width, 0.0f, (float)LRVGEngine::window_height, -1.0f, 1.0f)));
-#ifdef GL_MODELVIEW
 	glMatrixMode(GL_MODELVIEW);
-#endif
 	glLoadMatrixf(glm::value_ptr(glm::mat4(1.0f)));
-
-#ifdef GL_LIGHTING
     glDisable(GL_LIGHTING);
-#endif
-	glColor3f(1.0f, 1.0f, 1.0f);
-	glRasterPos2f(16.0f, 5.0f);
-#ifdef GL_LIGHTING
+    //LRVGEngine::draw_text_overlay(16, 10, LRVGEngine::screen_text.c_str(), 50.0f, (float)(LRVGEngine::window_height - 50));
     glEnable(GL_LIGHTING);
-#endif
     LRVGEngine::frames++;
 }
 
@@ -238,6 +209,37 @@ void ENG_API LRVGEngine::resize_callback(const int width, const int height) {
         LRVGEngine::active_camera->set_window_size(LRVGEngine::window_width, LRVGEngine::window_height);
 	}
 	glViewport(0, 0, width, height);
+}
+
+void ENG_API draw_text_overlay(int fb_width, int fb_height, const char *text, float x, float y, float r, float g, float b) {
+    if (!text) return;
+    glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT | GL_TRANSFORM_BIT);
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0.0, fb_width, 0.0, fb_height, -1.0, 1.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+    glDisable(GL_LIGHTING);
+    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_BLEND);
+    glDisable(GL_DEPTH_TEST);
+    glColor3f(r, g, b);
+    char buffer[99999];
+    int num_quads = stb_easy_font_print((float)x, (float)y, (char*)text, NULL, buffer, sizeof(buffer));
+    if (num_quads > 0) {
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glVertexPointer(2, GL_FLOAT, 16, buffer);
+        glDrawArrays(GL_QUADS, 0, num_quads * 4);
+        glDisableClientState(GL_VERTEX_ARRAY);
+    }
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glPopAttrib();
 }
 
 void ENG_API LRVGEngine::set_screen_text(const std::string text) {
@@ -272,14 +274,17 @@ std::vector<std::pair<std::shared_ptr<Object>, glm::mat4>> LRVGEngine::build_ren
     return render_list;
 }
 
+void ENG_API LRVGEngine::get_window_size(int &width, int &height) {
+    width = LRVGEngine::window_width;
+    height = LRVGEngine::window_height;
+}
+
 void ENG_API LRVGEngine::update() {
     if (!LRVGEngine::is_initialized_f) {
        ERROR("engine not initialized");
        return;
     }
-
     glfwPollEvents();
-
     double now = glfwGetTime();
     if (s_last_fps_time <= 0.0) s_last_fps_time = now;
     if (now - s_last_fps_time >= 1.0) {
@@ -297,6 +302,12 @@ void ENG_API LRVGEngine::clear_screen() {
 void ENG_API LRVGEngine::swap_buffers() {
     if (s_window) {
         glfwSwapBuffers(s_window);
+    }
+}
+
+void ENG_API LRVGEngine::vsync_enable() {
+    if (s_window) {
+        glfwSwapInterval(1);
     }
 }
 

@@ -8,6 +8,7 @@
 #include <glm/glm.hpp>
 
 #include "common.h"
+#include "glm/gtc/type_ptr.hpp"
 
 /**
  * Creates a new instance of Mesh with default values.
@@ -87,28 +88,35 @@ bool ENG_API Mesh::get_cast_shadows() const {
  * @param world_matrix A glm::mat4 representing the world transformation matrix.
  */
 void ENG_API Mesh::render(const glm::mat4 world_matrix) const {
-	Node::render(world_matrix);
-	this->material->render(world_matrix);
-	for (const auto& face : this->faces) {
-		glBegin(GL_TRIANGLES);
-		const glm::vec3 vertex_0 = this->vertices[std::get<0>(face)];
-		const glm::vec3 vertex_1 = this->vertices[std::get<1>(face)];
-		const glm::vec3 vertex_2 = this->vertices[std::get<2>(face)];
-		const glm::vec3 normal_0 = this->normals[std::get<0>(face)];
-		const glm::vec3 normal_1 = this->normals[std::get<1>(face)];
-		const glm::vec3 normal_2 = this->normals[std::get<2>(face)];
-		const glm::vec2 uv_0 = this->uvs[std::get<0>(face)];
-		const glm::vec2 uv_1 = this->uvs[std::get<1>(face)];
-		const glm::vec2 uv_2 = this->uvs[std::get<2>(face)];
-		glTexCoord2f(uv_0.x, uv_0.y);
-		glNormal3f(normal_0.x, normal_0.y, normal_0.z);
-		glVertex3f(vertex_0.x, vertex_0.y, vertex_0.z);
-		glTexCoord2f(uv_1.x, uv_1.y);
-		glNormal3f(normal_1.x, normal_1.y, normal_1.z);
-		glVertex3f(vertex_1.x, vertex_1.y, vertex_1.z);
-		glTexCoord2f(uv_2.x, uv_2.y);
-		glNormal3f(normal_2.x, normal_2.y, normal_2.z);
-		glVertex3f(vertex_2.x, vertex_2.y, vertex_2.z);
-		glEnd();
-	}
+    Node::render(world_matrix);
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glMultMatrixf(glm::value_ptr(world_matrix));
+    this->material->render(world_matrix);
+    glBegin(GL_TRIANGLES);
+    for (const auto& face : this->faces) {
+        const auto i0 = std::get<0>(face);
+        const auto i1 = std::get<1>(face);
+        const auto i2 = std::get<2>(face);
+        const glm::vec3 &v0 = this->vertices[i0];
+        const glm::vec3 &v1 = this->vertices[i1];
+        const glm::vec3 &v2 = this->vertices[i2];
+        const glm::vec3 &n0 = this->normals[i0];
+        const glm::vec3 &n1 = this->normals[i1];
+        const glm::vec3 &n2 = this->normals[i2];
+        const glm::vec2 &uv0 = this->uvs[i0];
+        const glm::vec2 &uv1 = this->uvs[i1];
+        const glm::vec2 &uv2 = this->uvs[i2];
+        glTexCoord2f(uv0.x, uv0.y);
+        glNormal3f(n0.x, n0.y, n0.z);
+        glVertex3f(v0.x, v0.y, v0.z);
+        glTexCoord2f(uv1.x, uv1.y);
+        glNormal3f(n1.x, n1.y, n1.z);
+        glVertex3f(v1.x, v1.y, v1.z);
+        glTexCoord2f(uv2.x, uv2.y);
+        glNormal3f(n2.x, n2.y, n2.z);
+        glVertex3f(v2.x, v2.y, v2.z);
+    }
+    glEnd();
+    glPopMatrix();
 }

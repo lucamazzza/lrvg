@@ -1,0 +1,45 @@
+[
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-Wall",
+      "-std=c++20",
+      "-fexceptions",
+      "-g",
+      "-D_DEBUG",
+      "-I../engine",
+      "-I../dependencies/glm/include",
+      "-I../dependencies/glad/include",
+      "-I../dependencies/freeimage/include",
+      "-I/opt/homebrew/include",
+      "-c",
+      "-o",
+      "obj/Debug/main.o",
+      "main.cpp"
+    ],
+    "directory": "/Users/lucamazza/projects/hanoi/client",
+    "file": "/Users/lucamazza/projects/hanoi/client/main.cpp",
+    "output": "/Users/lucamazza/projects/hanoi/client/obj/Debug/main.o"
+  },
+  {
+    "arguments": [
+      "/usr/bin/g++",
+      "-Wall",
+      "-std=c++20",
+      "-fexceptions",
+      "-O2",
+      "-I../engine",
+      "-I../dependencies/glm/include",
+      "-I../dependencies/glad/include",
+      "-I../dependencies/freeimage/include",
+      "-I/opt/homebrew/include",
+      "-c",
+      "-o",
+      "obj/Release/main.o",
+      "main.cpp"
+    ],
+    "directory": "/Users/lucamazza/projects/hanoi/client",
+    "file": "/Users/lucamazza/projects/hanoi/client/main.cpp",
+    "output": "/Users/lucamazza/projects/hanoi/client/obj/Release/main.o"
+  }
+]

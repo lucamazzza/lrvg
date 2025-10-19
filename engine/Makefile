@@ -2,9 +2,10 @@ CXX = g++
 AR = ar
 LD = g++
 WINDRES = windres
+BUILD_DATE = $(shell date +%Y%m%d)
 
 INC = -I../dependencies/glad/include -I../dependencies/glm/include -I../dependencies/freeimage/include
-CFLAGS = -Wall -std=c++20 -fPIC -m64 -fexceptions
+CFLAGS = -Wall -std=c++20 -fPIC -m64 -fexceptions -DBUILD_DATE=$(BUILD_DATE)
 RCFLAGS = 
 RESINC = 
 LIBDIR = 

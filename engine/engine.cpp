@@ -67,6 +67,7 @@ bool ENG_API LRVGEngine::init(const std::string window_title, const int width, c
    }
    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+   glfwWindowHint(GLFW_DEPTH_BITS, 24);
    s_window = glfwCreateWindow(width, height, window_title.c_str(), nullptr, nullptr);
    if (!s_window) {
        ERROR("Failed to create GLFW window");
@@ -93,7 +94,8 @@ bool ENG_API LRVGEngine::init(const std::string window_title, const int width, c
    glEnable(GL_NORMALIZE);
    glEnable(GL_LIGHTING);
    glEnable(GL_LIGHT0);
-   glEnable(GL_CULL_FACE);
+   glEnableClientState(GL_VERTEX_ARRAY);
+   //glEnable(GL_CULL_FACE);
    glShadeModel(GL_SMOOTH);
    const glm::vec4 ambient(0.2f, 0.2f, 0.2f, 1.0f);
    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, glm::value_ptr(ambient));
@@ -146,7 +148,11 @@ bool ENG_API LRVGEngine::free() {
        s_window = nullptr;
    }
    glfwTerminate();
-   DEBUG(LIB_NAME << " deinitialized");
+   DEBUG(LIB_VERSION_STRING << 
+#ifdef BUILD_DATE 
+        BUILD_DATE <<
+#endif 
+        " deinitialized");
    LRVGEngine::is_initialized_f = false;
    LRVGEngine::is_running_f = false;
    return true;
@@ -164,7 +170,15 @@ void ENG_API LRVGEngine::render() {
 	for (int i = 0; i < max_lights; i++) {
 	    glDisable(GL_LIGHT0 + i);
 	}
-	auto render_list = LRVGEngine::build_render_list(LRVGEngine::scene, glm::mat4(1.0f));
+    auto render_list = LRVGEngine::build_render_list(LRVGEngine::scene, glm::mat4(1.0f));
+    if (LRVGEngine::active_camera) {
+	    for (const auto& node : render_list) {
+	        if (node.first == LRVGEngine::active_camera) {
+	            LRVGEngine::active_camera->render(node.second);
+	            break;
+	        }
+	    }
+	}
 	std::sort(render_list.begin(), render_list.end(), [](const std::pair<std::shared_ptr<Object>, glm::mat4>& a, const std::pair<std::shared_ptr<Object>, glm::mat4>& b) {
         return a.first->get_priority() < b.first->get_priority();
 	});
@@ -192,8 +206,13 @@ void ENG_API LRVGEngine::render() {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadMatrixf(glm::value_ptr(glm::mat4(1.0f)));
     glDisable(GL_LIGHTING);
-    //LRVGEngine::draw_text_overlay(16, 10, LRVGEngine::screen_text.c_str(), 50.0f, (float)(LRVGEngine::window_height - 50));
     glEnable(GL_LIGHTING);
+    /*if (!LRVGEngine::screen_text.empty()) {
+        LRVGEngine::draw_text_overlay(LRVGEngine::window_width, LRVGEngine::window_height,
+                          LRVGEngine::screen_text.c_str(),
+                          16.0f, (float)(LRVGEngine::window_height - 50),
+                          1.0f, 1.0f, 1.0f);
+    }*/
     LRVGEngine::frames++;
 }
 
@@ -296,7 +315,7 @@ void ENG_API LRVGEngine::update() {
 }
 
 void ENG_API LRVGEngine::clear_screen() {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void ENG_API LRVGEngine::swap_buffers() {

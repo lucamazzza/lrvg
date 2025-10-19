@@ -9,12 +9,11 @@
 
 #pragma once
 
-#ifdef _DEBUG
-#define LIB_NAME      "LRVGEngine v0.1a (debug)"
-#else
-#define LIB_NAME      "LRVGEngine v0.1a"
-#endif
-#define LIB_VERSION   10
+#define LIB_NAME            "LRVGEngine"
+#define LIB_VERSION_MAJOR   "0"
+#define LIB_VERSION_MINOR   "1"
+#define LIB_VERSION_PATCH   "0"
+#define LIB_VERSION_STRING  LIB_NAME " v" LIB_VERSION_MAJOR "." LIB_VERSION_MINOR "." LIB_VERSION_PATCH "."
 
 #include <memory> 
 #include <string>

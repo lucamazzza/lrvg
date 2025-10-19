@@ -59,14 +59,10 @@ int main() {
     LRVGEngine::set_sky_color(0.0f,0.0f,0.15f);
     auto cube = std::make_shared<Cube>();
     cube->set_name("MyCube");
-    cube->set_position(glm::vec3(1.0f, 1.0f, 1.0f));
+    cube->set_position(glm::vec3(0.0f, 0.0f, 0.0f));
     cube->set_scale(glm::vec3(2.0f));
     cube->set_cast_shadows(true);
     auto mat = std::make_shared<Material>();
-    mat->set_diffuse_color(glm::vec3(0.8f, 0.2f, 0.2f));
-    mat->set_ambient_color(glm::vec3(0.2f));
-    mat->set_shininess(8.0f);
-    mat->set_emission_color(glm::vec3(0.9f, 0.1f, 0.1f)); 
     cube->set_material(mat);
     root->add_child(cube);
     auto light = std::make_shared<PointLight>();
@@ -74,7 +70,8 @@ int main() {
     light->set_diffuse_color(glm::vec3(3.0f));
     root->add_child(light);
     auto cam = std::make_shared<PerspectiveCamera>();
-    cam->set_position(glm::vec3(0.0f, 0.0f, 3.0f));
+    cam->set_fov(45.0f);
+    cam->set_position(glm::vec3(0.0f, 0.0f, -3.0f));
     cam->set_rotation(glm::vec3(0.0f, 0.0f, 0.0f));
     root->add_child(cam);
     LRVGEngine::set_scene(root);

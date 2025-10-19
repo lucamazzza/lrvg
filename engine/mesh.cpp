@@ -117,6 +117,8 @@ void ENG_API Mesh::render(const glm::mat4 world_matrix) const {
         glNormal3f(n2.x, n2.y, n2.z);
         glVertex3f(v2.x, v2.y, v2.z);
     }
+    glVertexPointer(3, GL_FLOAT, 0, this->vertices.data());
+    glDrawElements(GL_TRIANGLES, 0, GL_UNSIGNED_INT, this->faces.data());
     glEnd();
     glPopMatrix();
 }

@@ -3,7 +3,6 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 
-#include "common.h"
 #include "mesh.h"
 
 /**
@@ -20,14 +19,14 @@ void Cube::render(const glm::mat4 world_matrix) const {
  */
 Cube::Cube() {
 	std::vector<glm::vec3> vertices = {
-		{ -0.5f, -0.5f,  0.5f },
-		{  0.5f, -0.5f,  0.5f },
-		{  0.5f,  0.5f,  0.5f },
-		{ -0.5f,  0.5f,  0.5f },
-		{ -0.5f, -0.5f, -0.5f },
-		{  0.5f, -0.5f, -0.5f },
-		{  0.5f,  0.5f, -0.5f },
-		{ -0.5f,  0.5f, -0.5f }
+		{ -1.0f, -1.0f, -1.0f },
+		{  1.0f, -1.0f, -1.0f },
+		{  1.0f,  1.0f, -1.0f },
+		{ -1.0f,  1.0f, -1.0f },
+		{ -1.0f, -1.0f,  1.0f },
+		{  1.0f, -1.0f,  1.0f },
+		{  1.0f,  1.0f,  1.0f },
+		{ -1.0f,  1.0f,  1.0f }
 	};
 	std::vector<glm::vec3> normals(vertices.size());
 	for (size_t i = 0; i < normals.size(); ++i) normals[i] = glm::vec3(0.0f);
@@ -43,11 +42,11 @@ Cube::Cube() {
 	};
 	std::vector<std::tuple<uint32_t, uint32_t, uint32_t>> faces = {
 		{0, 1, 2}, {0, 2, 3},
-		{5, 4, 7}, {5, 7, 6},
-		{1, 5, 6}, {1, 6, 2},
-		{4, 0, 3}, {4, 3, 7},
-		{3, 2, 6}, {3, 6, 7},
-		{4, 5, 1}, {4, 1, 0}
+		{4, 5, 6}, {6, 7, 4},
+		{0, 4, 7}, {7, 3, 0},
+		{1, 5, 6}, {6, 2, 1},
+		{0, 1, 5}, {5, 4, 0},
+		{3, 2, 6}, {6, 7, 3}
 	};
 	for (const auto& f : faces) {
 		uint32_t i0 = std::get<0>(f);

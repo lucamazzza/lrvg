@@ -93,11 +93,11 @@ void ENG_API Material::render(const glm::mat4 world_matrix) const {
 	const glm::vec4 ambient4 (this->ambient_color,  1.0f);
 	const glm::vec4 diffuse4 (this->diffuse_color,  1.0f);
 	const glm::vec4 specular4(this->specular_color, 1.0f);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, glm::value_ptr(emission4));
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT, glm::value_ptr(ambient4));
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE, glm::value_ptr(diffuse4));
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, glm::value_ptr(specular4));
-	glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, this->shininess);
+	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION,  glm::value_ptr(emission4));
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   glm::value_ptr(ambient4));
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   glm::value_ptr(diffuse4));
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  glm::value_ptr(specular4));
+	glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, this->shininess);
 	if (this->texture != nullptr) {
 		this->texture->render(world_matrix);
 	} else {

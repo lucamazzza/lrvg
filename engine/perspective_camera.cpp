@@ -30,7 +30,7 @@ void ENG_API PerspectiveCamera::render(const glm::mat4 world_matrix) const {
         glm::perspective(glm::radians(this->fov), aspect_ratio, this->near_clipping, this->far_clipping);
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixf(glm::value_ptr(perspective_matrix));
-    const glm::mat4 view_matrix = glm::inverse(world_matrix);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixf(glm::value_ptr(view_matrix));
+   // const glm::mat4 view_matrix = glm::inverse(world_matrix);
+   // glMatrixMode(GL_MODELVIEW);
+   // glLoadMatrixf(glm::value_ptr(view_matrix));
 }

@@ -1,6 +1,7 @@
 #include "sphere.h"
 
 #include <glad/glad.h>
+#include <glfw/glfw3.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
@@ -32,12 +33,10 @@ Sphere::Sphere(int lat_segments, int lon_segments) {
 			uint32_t i1 = i0 + 1;
 			uint32_t i2 = i0 + (lon_segments + 1);
 			uint32_t i3 = i2 + 1;
-			// Two triangles per quad
 			faces.emplace_back(i0, i2, i1);
 			faces.emplace_back(i1, i2, i3);
 		}
 	}
-
 	this->set_mesh_data(vertices, faces, normals, uvs);
 }
 

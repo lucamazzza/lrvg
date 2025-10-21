@@ -50,7 +50,4 @@ void ENG_API OrthoCamera::render(const glm::mat4 world_matrix) const {
     const glm::mat4 ortho_matrix = glm::ortho(-halfW, halfW, -halfH, halfH, this->near_clipping, this->far_clipping);
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixf(glm::value_ptr(ortho_matrix));
-    const glm::mat4 view_matrix = glm::inverse(world_matrix);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadMatrixf(glm::value_ptr(view_matrix));
 }

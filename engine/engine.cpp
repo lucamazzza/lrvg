@@ -92,12 +92,12 @@ bool ENG_API LRVGEngine::init(const std::string window_title, const int width, c
    glfwSetFramebufferSizeCallback(s_window, glfw_framebuffer_size_callback);
    glfwSetKeyCallback(s_window, glfw_key_callback);
    glEnable(GL_DEPTH_TEST);
+   glDepthFunc(GL_LESS);
    glEnable(GL_NORMALIZE);
    glEnable(GL_LIGHTING);
    glEnable(GL_LIGHT0);
    glEnableClientState(GL_VERTEX_ARRAY);
    glEnable(GL_CULL_FACE);
-   glEnable(GL_DEPTH_BUFFER_BIT);
    glShadeModel(GL_SMOOTH);
    const glm::vec4 ambient(0.2f, 0.2f, 0.2f, 1.0f);
    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, glm::value_ptr(ambient));
@@ -186,30 +186,31 @@ void ENG_API LRVGEngine::render() {
 	});
 	const glm::mat4 inv_camera_matrix = glm::inverse(LRVGEngine::active_camera->get_local_matrix());
     for (const auto& node : render_list) {
-		node.first->render(node.second);
+        if (node.first == LRVGEngine::active_camera) continue;
+		node.first->render(inv_camera_matrix * node.second);
     }
 
     glDepthFunc(GL_LEQUAL);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDepthMask(GL_FALSE);
     const glm::mat4 shadow_model_scale_matrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 0.05f, 1.0f));
     for (const auto& node : render_list) {
-		std::shared_ptr<Mesh> mesh = std::dynamic_pointer_cast<Mesh>(node.first);
+        std::shared_ptr<Mesh> mesh = std::dynamic_pointer_cast<Mesh>(node.first);
         if (mesh != nullptr && mesh->get_cast_shadows()) {
-			const std::shared_ptr<Material> original_material = mesh->get_material();
+            const std::shared_ptr<Material> original_material = mesh->get_material();
             mesh->set_material(LRVGEngine::shadow_material);
             const glm::mat4 shadow_matrix = shadow_model_scale_matrix * node.second;
+            // Use same view * model approach for shadows
             mesh->render(inv_camera_matrix * shadow_matrix);
-			mesh->set_material(original_material);
+            mesh->set_material(original_material);
         }
     }
-	glDepthFunc(GL_LESS);
-    glClear(GL_DEPTH_BUFFER_BIT);
-	glMatrixMode(GL_PROJECTION);
-	glLoadMatrixf(glm::value_ptr(glm::ortho(0.0f, (float)LRVGEngine::window_width, 0.0f, (float)LRVGEngine::window_height, -1.0f, 1.0f)));
-	glMatrixMode(GL_MODELVIEW);
-	glLoadMatrixf(glm::value_ptr(glm::mat4(1.0f)));
+    glDepthMask(GL_TRUE);
+    glDisable(GL_BLEND);
     std::stringstream fps;
     fps << LRVGEngine::fps << " fps";
-    LRVGEngine::draw_text_overlay(LRVGEngine::window_width, LRVGEngine::window_height, fps.str().c_str(), 16.0f, 45.0f, 1.0f, 1.0f, 1.0f);
+    LRVGEngine::draw_text_overlay(LRVGEngine::window_width, LRVGEngine::window_height, fps.str().c_str(), 10.0f, 15.0f, 0.0f, 1.0f, 0.0f);
     if (!LRVGEngine::screen_text.empty()) {
         LRVGEngine::draw_text_overlay(LRVGEngine::window_width, LRVGEngine::window_height, LRVGEngine::screen_text.c_str(), 16.0f, (float)(LRVGEngine::window_height - 50), 1.0f, 1.0f, 1.0f);
     }
@@ -232,20 +233,17 @@ void ENG_API LRVGEngine::resize_callback(const int width, const int height) {
 
 void ENG_API LRVGEngine::draw_text_overlay(int fb_width, int fb_height, const char *text, float x, float y, float r, float g, float b) {
     if (!text) return;
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glDepthFunc(GL_LESS);
     glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT | GL_TRANSFORM_BIT);
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
+    glm::mat4 ortho = glm::ortho(0.0f, (float)fb_width, (float)fb_height, 0.0f, -1.0f, 1.0f);
+    glLoadMatrixf(glm::value_ptr(ortho));
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glOrtho(0.0, fb_width, 0.0, fb_height, -1.0, 1.0);
-    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     glDisable(GL_LIGHTING);
-    glDisable(GL_TEXTURE_2D);
-    glDisable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
     glColor3f(r, g, b);
     char buffer[99999];
     int num_quads = stb_easy_font_print((float)x, (float)y, (char*)text, NULL, buffer, sizeof(buffer));

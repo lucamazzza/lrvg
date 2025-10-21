@@ -54,7 +54,7 @@ public:
 	static bool free();
     static void resize_callback(const int width, const int height);
     static void vsync_enable();
-    static void draw_text_overlay(int fb_width, int fb_height, const char* text, float x, float y, float r = 1.0f, float g = 1.0f, float b = 1.0f);
+    static void draw_text_overlay(int fb_width, int fb_height, const char* text, float x, float y, float r, float g, float b);
     static void get_window_size(int& width, int& height);
 private: 
 	static std::vector<std::pair<std::shared_ptr<Object>, glm::mat4>> build_render_list(const std::shared_ptr<Object>, const glm::mat4 par_world_matrix);

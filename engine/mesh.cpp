@@ -89,9 +89,7 @@ bool ENG_API Mesh::get_cast_shadows() const {
  */
 void ENG_API Mesh::render(const glm::mat4 world_matrix) const {
     Node::render(world_matrix);
-    glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
-    glMultMatrixf(glm::value_ptr(world_matrix));
     this->material->render(world_matrix);
     glBegin(GL_TRIANGLES);
     for (const auto& face : this->faces) {

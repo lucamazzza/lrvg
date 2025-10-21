@@ -1,8 +1,10 @@
 #include "engine.h"
 
 #include <algorithm>
+#include <cstdio>
 #include <memory>
 #include <string>
+#include <sstream>
 #include <utility>
 #include <vector>
 #include <iostream>
@@ -75,7 +77,6 @@ bool ENG_API LRVGEngine::init(const std::string window_title, const int width, c
        return false;
    }
    glfwMakeContextCurrent(s_window);
-   glfwSwapInterval(1);
    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
        ERROR("Failed to initialize GLAD");
        glfwDestroyWindow(s_window);
@@ -95,7 +96,8 @@ bool ENG_API LRVGEngine::init(const std::string window_title, const int width, c
    glEnable(GL_LIGHTING);
    glEnable(GL_LIGHT0);
    glEnableClientState(GL_VERTEX_ARRAY);
-   //glEnable(GL_CULL_FACE);
+   glEnable(GL_CULL_FACE);
+   glEnable(GL_DEPTH_BUFFER_BIT);
    glShadeModel(GL_SMOOTH);
    const glm::vec4 ambient(0.2f, 0.2f, 0.2f, 1.0f);
    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, glm::value_ptr(ambient));
@@ -205,14 +207,12 @@ void ENG_API LRVGEngine::render() {
 	glLoadMatrixf(glm::value_ptr(glm::ortho(0.0f, (float)LRVGEngine::window_width, 0.0f, (float)LRVGEngine::window_height, -1.0f, 1.0f)));
 	glMatrixMode(GL_MODELVIEW);
 	glLoadMatrixf(glm::value_ptr(glm::mat4(1.0f)));
-    glDisable(GL_LIGHTING);
-    glEnable(GL_LIGHTING);
-    /*if (!LRVGEngine::screen_text.empty()) {
-        LRVGEngine::draw_text_overlay(LRVGEngine::window_width, LRVGEngine::window_height,
-                          LRVGEngine::screen_text.c_str(),
-                          16.0f, (float)(LRVGEngine::window_height - 50),
-                          1.0f, 1.0f, 1.0f);
-    }*/
+    std::stringstream fps;
+    fps << LRVGEngine::fps << " fps";
+    LRVGEngine::draw_text_overlay(LRVGEngine::window_width, LRVGEngine::window_height, fps.str().c_str(), 16.0f, 45.0f, 1.0f, 1.0f, 1.0f);
+    if (!LRVGEngine::screen_text.empty()) {
+        LRVGEngine::draw_text_overlay(LRVGEngine::window_width, LRVGEngine::window_height, LRVGEngine::screen_text.c_str(), 16.0f, (float)(LRVGEngine::window_height - 50), 1.0f, 1.0f, 1.0f);
+    }
     LRVGEngine::frames++;
 }
 
@@ -230,7 +230,7 @@ void ENG_API LRVGEngine::resize_callback(const int width, const int height) {
 	glViewport(0, 0, width, height);
 }
 
-void ENG_API draw_text_overlay(int fb_width, int fb_height, const char *text, float x, float y, float r, float g, float b) {
+void ENG_API LRVGEngine::draw_text_overlay(int fb_width, int fb_height, const char *text, float x, float y, float r, float g, float b) {
     if (!text) return;
     glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT | GL_TRANSFORM_BIT);
     glMatrixMode(GL_PROJECTION);

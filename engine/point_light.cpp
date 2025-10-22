@@ -7,6 +7,8 @@
 #include "common.h"
 #include "node.h"
 
+using namespace lrvg;
+
 /**
  * Creates a point light with default parameters.
  * 

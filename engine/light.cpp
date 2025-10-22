@@ -4,6 +4,8 @@
 
 #include "common.h"
 
+using namespace lrvg;
+
 int Light::next_light_id = 0;
 
 /**

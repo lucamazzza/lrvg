@@ -23,6 +23,8 @@
 #include "common.h"
 #include "object.h"
 
+namespace lrvg {
+
 /**
  * @brief Texture object class.
  */
@@ -35,3 +37,5 @@ private:
 	void* bitmap;
 	unsigned int texture_id;
 };
+
+}

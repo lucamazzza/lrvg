@@ -9,6 +9,8 @@
 #include "common.h"
 #include "node.h"
 
+using namespace lrvg;
+
 /**
  * Creates a spot light with default parameters.
  * 

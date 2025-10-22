@@ -12,6 +12,8 @@
 #include "common.h"
 #include "mesh.h"
 
+namespace lrvg {
+
 /**
  * @brief Cube mesh class.
  */
@@ -20,3 +22,5 @@ public:
     Cube();
 	void render(const glm::mat4 world_matrix) const override;
 };
+
+}

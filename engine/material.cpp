@@ -7,6 +7,8 @@
 
 #include "texture.h"
 
+using namespace lrvg;
+
 /**
  * Creates a new instance of Material with default color and texture properties.
  * Default properties:

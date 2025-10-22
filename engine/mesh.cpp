@@ -10,6 +10,8 @@
 #include "common.h"
 #include "glm/gtc/type_ptr.hpp"
 
+using namespace lrvg;
+
 /**
  * Creates a new instance of Mesh with default values.
  */

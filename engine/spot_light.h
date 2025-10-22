@@ -12,6 +12,8 @@
 #include "common.h"
 #include "light.h"
 
+namespace lrvg {
+
 /**
  * @brief Spot light class.
  */
@@ -29,3 +31,5 @@ private:
 	float exponent;
 	glm::vec3 direction;
 };
+
+}

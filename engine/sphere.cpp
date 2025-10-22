@@ -8,6 +8,8 @@
 #include "common.h"
 #include "mesh.h"
 
+using namespace lrvg;
+
 Sphere::Sphere(int lat_segments, int lon_segments) {
 	std::vector<glm::vec3> vertices;
 	std::vector<glm::vec3> normals;

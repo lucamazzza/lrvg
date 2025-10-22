@@ -8,6 +8,8 @@
 #include "common.h"
 #include "node.h"
 
+using namespace lrvg;
+
 /**
  * Creates a directional light with default parameters.
  * 

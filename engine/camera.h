@@ -9,12 +9,12 @@
 
 #pragma once
 
-#include <memory>
-
 #include <glm/glm.hpp>
 
 #include "common.h"
 #include "node.h"
+
+namespace lrvg {
 
 /**
  * @brief Camera node base class. A camera defines the point of view from which the scene is rendered.
@@ -27,6 +27,7 @@ public:
 	void set_fov(const float fov);
 	void set_clipping(const float near_clipping, const float far_clipping);
 	void set_active(const bool is_active);
+    virtual void render(const glm::mat4 world_matrix) const override = 0;
 protected:
 	float fov;
 	float near_clipping;
@@ -35,3 +36,5 @@ protected:
 	int window_width;
 	bool is_active;
 };
+
+}

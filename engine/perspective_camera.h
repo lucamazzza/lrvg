@@ -16,6 +16,8 @@
 #include "common.h"
 #include "camera.h"
 
+namespace lrvg {
+
 /**
  * @brief Perspective camera class.
  */
@@ -23,3 +25,5 @@ class ENG_API PerspectiveCamera : public Camera {
 public:
 	void render(const glm::mat4 world_matrix) const override;
 };
+
+}

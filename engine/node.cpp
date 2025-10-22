@@ -6,6 +6,8 @@
 
 #include "common.h"
 
+using namespace lrvg;
+
 /**
  * Creates a new instance of Node with default transformation values.
  * 

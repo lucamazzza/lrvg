@@ -7,6 +7,8 @@
 
 #include "common.h"
 
+using namespace lrvg;
+
 /**
  * Renders the scene from the perspective camera's point of view.
  * This method sets up the perspective projection matrix based on the camera's field of view,

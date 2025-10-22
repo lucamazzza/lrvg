@@ -2,6 +2,8 @@
 
 #include "common.h"
 
+using namespace lrvg;
+
 /**
  * Creates a new instance of Camera with default parameters.
  * 

@@ -10,6 +10,8 @@
 #include "common.h"
 #include "node.h"
 
+using namespace lrvg;
+
 /**
  * Sets the zoom level of the orthographic camera.
  * The zoom level must be greater than or equal to 0.1 to avoid invalid projection matrices.

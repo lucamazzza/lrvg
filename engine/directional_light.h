@@ -14,6 +14,8 @@
 #include "common.h"
 #include "light.h"
 
+namespace lrvg {
+
 class ENG_API DirectionalLight : public Light {
 public:
 	DirectionalLight();
@@ -22,3 +24,5 @@ public:
 private:
 	glm::vec3 direction;
 };
+
+}

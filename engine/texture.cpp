@@ -4,6 +4,8 @@
 #define FREEIMAGE_LIB
 #include <FreeImage.h>
 
+using namespace lrvg;
+
 /**
  * Creates a new texture by loading an image from the specified file path.
  * 

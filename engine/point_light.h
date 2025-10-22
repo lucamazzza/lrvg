@@ -12,7 +12,9 @@
 #include "common.h"
 #include "light.h"
 
-/**
+namespace lrvg {
+
+/**
  * @brief Point light class.
  */
 class ENG_API PointLight : public Light {
@@ -23,3 +25,5 @@ public:
 private:
 	float radius;
 };
+
+}

@@ -5,6 +5,8 @@
 
 #include "mesh.h"
 
+using namespace lrvg;
+
 /**
  * Construct a unit cube (centered at origin) as a Mesh by supplying vertices,
  * indices (as triangle faces), normals and UVs to Mesh::set_mesh_data.

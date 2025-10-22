@@ -15,7 +15,7 @@
 #include <point_light.h>
 #include <cube.h>
 
-std::shared_ptr<PerspectiveCamera> saved_camera = nullptr;
+std::shared_ptr<lrvg::PerspectiveCamera> saved_camera = nullptr;
 bool perspective_camera_is_used = false;
 
 
@@ -27,17 +27,17 @@ bool perspective_camera_is_used = false;
  * @return error code (0 on success, error code otherwise)
  */
 int main() {
-    auto root = std::make_shared<Node>();
-    LRVGEngine::init("Hanoi", 800, 600);
-    //LRVGEngine::vsync_enable();
-    LRVGEngine::set_sky_color(0.0f,0.0f,0.15f);
-    auto material = std::make_shared<Material>();
+    auto root = std::make_shared<lrvg::Node>();
+    lrvg::Engine::init("Hanoi", 800, 600);
+    //lrvg::Engine::vsync_enable();
+    lrvg::Engine::set_sky_color(0.0f,0.0f,0.15f);
+    auto material = std::make_shared<lrvg::Material>();
     material->set_ambient_color(glm::vec3(1, 0, 0));
     material->set_diffuse_color(glm::vec3(1, 0, 0));
     material->set_emission_color(glm::vec3(1, 0, 0));
     material->set_specular_color(glm::vec3(1, 0, 0));
     material->set_shininess(10);
-    auto cube = std::make_shared<Cube>();
+    auto cube = std::make_shared<lrvg::Cube>();
     cube->set_name("MyCube");
     cube->set_position(glm::vec3(0.0f, 0.0f, -3.0f));
     cube->set_scale(glm::vec3(0.1f));
@@ -45,27 +45,28 @@ int main() {
     cube->set_cast_shadows(true);
     cube->set_material(material);
     root->add_child(cube);
-    auto light = std::make_shared<PointLight>();
+    auto light = std::make_shared<lrvg::PointLight>();
     light->set_specular_color(glm::vec3(1));
     light->set_diffuse_color(glm::vec3(1));
     light->set_ambient_color(glm::vec3(1));
     light->set_radius(2);
     light->set_position(glm::vec3(0, 1, 0));
     root->add_child(light);
-    auto cam = std::make_shared<PerspectiveCamera>();
+    auto cam = std::make_shared<lrvg::PerspectiveCamera>();
     cam->set_fov(12.0f);
     cam->set_position(glm::vec3(0.0f, 0.0f, 1.0f));
     cam->set_rotation(glm::vec3(0.0f, 0.0f, 0.0f));
     root->add_child(cam);
-    LRVGEngine::set_scene(root);
-    LRVGEngine::set_active_camera(cam);
-    while (LRVGEngine::is_running()) {
-        LRVGEngine::update();
-        LRVGEngine::clear_screen();
-        LRVGEngine::render();
-        LRVGEngine::swap_buffers();
+    lrvg::Engine::set_scene(root);
+    lrvg::Engine::set_active_camera(cam);
+    while (lrvg::Engine::is_running()) {
+        lrvg::Engine::update();
+        lrvg::Engine::clear_screen();
+        lrvg::Engine::render();
+        lrvg::Engine::swap_buffers();
     }
-    LRVGEngine::free();
+    lrvg::Engine::free();
+    std::cout << "exiting\n";
     return 0;
 }
 

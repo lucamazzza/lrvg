@@ -9,6 +9,8 @@
 
 #include "common.h"
 
+using namespace lrvg;
+
 int Object::next_id = 0;
 
 /**

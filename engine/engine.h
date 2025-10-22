@@ -20,14 +20,16 @@
 #include "camera.h"
 #include "material.h"
 
+namespace lrvg {
+
 /**
  * @brief Base engine main class. This class is a singleton.
  */
-class ENG_API LRVGEngine final {
+class ENG_API Engine final {
 public: 
-	LRVGEngine(LRVGEngine const &) = delete;
-	~LRVGEngine();
-	void operator=(LRVGEngine const &) = delete;
+	Engine(Engine const &) = delete;
+	~Engine();
+	void operator=(Engine const &) = delete;
 	static bool init(const std::string window_title, const int window_width, const int window_height);
 	static void run();
 	static void set_keyboard_callback(void(*keyboard_callback)(const unsigned char key, const int mouse_x, const int mouse_y));
@@ -64,5 +66,7 @@ private:
 	static float fps;
 	static bool is_initialized_f;
 	static bool is_running_f;
-	LRVGEngine();
+	Engine();
 };
+
+}

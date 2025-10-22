@@ -19,7 +19,7 @@ ENG_API Texture::Texture(const std::string path) : Object() {
 		bmp = FreeImage_Load(fif, path.c_str());
 	}
 	if (bmp == nullptr) {
-		ERROR("Failed to load texture from path: " + path);
+		ERROR("Failed to load texture from path: %s", path.c_str());
 		this->bitmap = nullptr;
 		this->texture_id = 0;
 		return;
@@ -27,7 +27,7 @@ ENG_API Texture::Texture(const std::string path) : Object() {
 	FIBITMAP* converted = FreeImage_ConvertTo32Bits(bmp);
 	FreeImage_Unload(bmp);
 	if (converted == nullptr) {
-		ERROR("Failed to convert texture to 32-bit: " + path);
+		ERROR("Failed to convert texture to 32-bit: %s", path.c_str());
 		this->bitmap = nullptr;
 		this->texture_id = 0;
 		return;
@@ -37,7 +37,7 @@ ENG_API Texture::Texture(const std::string path) : Object() {
 	const int height = FreeImage_GetHeight(converted);
 	BYTE* bits = FreeImage_GetBits(converted);
 	if (bits == nullptr || width == 0 || height == 0) {
-		ERROR("Invalid image data for texture: " + path);
+		ERROR("Invalid image data for texture: %s", path.c_str());
 		FreeImage_Unload(converted);
 		this->bitmap = nullptr;
 		this->texture_id = 0;

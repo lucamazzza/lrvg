@@ -53,8 +53,8 @@ int APIENTRY DllMain(HANDLE instDLL, DWORD reason, LPVOID _reserved) {
 #endif
 
 ENG_API LRVGEngine::~LRVGEngine() {
-#ifdef _DEBUG
-    DEBUG(std::source_location::current().function_name() << " invoked" << std::endl);
+#ifdef NDEBUG
+    DEBUG("%s invoked", std::source_location::current().function_name());
 #endif
 }
 
@@ -107,7 +107,7 @@ bool ENG_API LRVGEngine::init(const std::string window_title, const int width, c
    LRVGEngine::shadow_material->set_diffuse_color(glm::vec3(0.0f, 0.0f, 0.0f));
    LRVGEngine::shadow_material->set_specular_color(glm::vec3(0.0f, 0.0f, 0.0f));
    LRVGEngine::shadow_material->set_shininess(0.0f);
-   DEBUG(LIB_NAME << " initialized");
+   DEBUG("%s initialized", LIB_NAME);
    LRVGEngine::is_initialized_f = true;
    LRVGEngine::is_running_f = true;
    s_last_fps_time = glfwGetTime();
@@ -116,7 +116,9 @@ bool ENG_API LRVGEngine::init(const std::string window_title, const int width, c
    return true;
 }
 
-void ENG_API LRVGEngine::set_keyboard_callback(void (*new_keyboard_callback) (const unsigned char key, const int mouse_x, const int mouse_y)) {
+void ENG_API LRVGEngine::set_keyboard_callback(
+        void (*new_keyboard_callback) (const unsigned char key, const int mouse_x, const int mouse_y)
+) {
     s_keyboard_cb = new_keyboard_callback;
     if (s_window) {
         glfwSetKeyCallback(s_window, glfw_key_callback);
@@ -150,11 +152,7 @@ bool ENG_API LRVGEngine::free() {
        s_window = nullptr;
    }
    glfwTerminate();
-   DEBUG(LIB_VERSION_STRING << 
-#ifdef BUILD_DATE 
-        BUILD_DATE <<
-#endif 
-        " deinitialized");
+   DEBUG("%s.%d deinitialized", LIB_VERSION_STRING, BUILD_DATE);
    LRVGEngine::is_initialized_f = false;
    LRVGEngine::is_running_f = false;
    return true;
@@ -168,7 +166,7 @@ void ENG_API LRVGEngine::render() {
 	LRVGEngine::active_camera->set_window_size(LRVGEngine::window_width, LRVGEngine::window_height);
     int max_lights = 0;
 	glGetIntegerv(GL_MAX_LIGHTS, &max_lights);
-	//DEBUG("Max lights: " << max_lights);
+	//DEBUG("Max lights: %d", max_lights);
 	for (int i = 0; i < max_lights; i++) {
 	    glDisable(GL_LIGHT0 + i);
 	}
@@ -181,7 +179,13 @@ void ENG_API LRVGEngine::render() {
 	        }
 	    }
 	}
-	std::sort(render_list.begin(), render_list.end(), [](const std::pair<std::shared_ptr<Object>, glm::mat4>& a, const std::pair<std::shared_ptr<Object>, glm::mat4>& b) {
+	std::sort(
+            render_list.begin(), 
+            render_list.end(), 
+            [](
+                const std::pair<std::shared_ptr<Object>, glm::mat4>& a, 
+                const std::pair<std::shared_ptr<Object>, glm::mat4>& b
+            ) {
         return a.first->get_priority() < b.first->get_priority();
 	});
 	const glm::mat4 inv_camera_matrix = glm::inverse(LRVGEngine::active_camera->get_local_matrix());
@@ -201,7 +205,6 @@ void ENG_API LRVGEngine::render() {
             const std::shared_ptr<Material> original_material = mesh->get_material();
             mesh->set_material(LRVGEngine::shadow_material);
             const glm::mat4 shadow_matrix = shadow_model_scale_matrix * node.second;
-            // Use same view * model approach for shadows
             mesh->render(inv_camera_matrix * shadow_matrix);
             mesh->set_material(original_material);
         }
@@ -210,9 +213,23 @@ void ENG_API LRVGEngine::render() {
     glDisable(GL_BLEND);
     std::stringstream fps;
     fps << LRVGEngine::fps << " fps";
-    LRVGEngine::draw_text_overlay(LRVGEngine::window_width, LRVGEngine::window_height, fps.str().c_str(), 10.0f, 15.0f, 0.0f, 1.0f, 0.0f);
+    LRVGEngine::draw_text_overlay(
+            LRVGEngine::window_width, 
+            LRVGEngine::window_height, 
+            fps.str().c_str(), 
+            10.0f, 
+            1.0f,
+            0.0f, 1.0f, 0.0f
+    );
     if (!LRVGEngine::screen_text.empty()) {
-        LRVGEngine::draw_text_overlay(LRVGEngine::window_width, LRVGEngine::window_height, LRVGEngine::screen_text.c_str(), 16.0f, (float)(LRVGEngine::window_height - 50), 1.0f, 1.0f, 1.0f);
+        LRVGEngine::draw_text_overlay(
+                LRVGEngine::window_width, 
+                LRVGEngine::window_height,
+                LRVGEngine::screen_text.c_str(), 
+                16.0f, 
+                (float)(LRVGEngine::window_height - 50), 
+                1.0f, 1.0f, 1.0f
+        );
     }
     LRVGEngine::frames++;
 }
@@ -224,15 +241,25 @@ void ENG_API LRVGEngine::timer_callback(int val) {
 void ENG_API LRVGEngine::resize_callback(const int width, const int height) {
     LRVGEngine::window_width = width;
 	LRVGEngine::window_height = height;
-	DEBUG("Window resized to " << width << "x" << height);
+	DEBUG("Window resized to %dx%d", width, height);
     if (LRVGEngine::active_camera != nullptr) {
         LRVGEngine::active_camera->set_window_size(LRVGEngine::window_width, LRVGEngine::window_height);
 	}
 	glViewport(0, 0, width, height);
 }
 
-void ENG_API LRVGEngine::draw_text_overlay(int fb_width, int fb_height, const char *text, float x, float y, float r, float g, float b) {
+void ENG_API LRVGEngine::draw_text_overlay(
+        int fb_width,
+        int fb_height,
+        const char *text,
+        float x,
+        float y,
+        float r, float g, float b
+) {
     if (!text) return;
+    static std::vector<char> vbuf(1 << 16);
+    int num_quads = stb_easy_font_print((float)x, (float)y, (char*)text, NULL, vbuf.data(), (int)vbuf.size());
+    if (num_quads <= 0) return;
     glClear(GL_DEPTH_BUFFER_BIT);
     glDepthFunc(GL_LESS);
     glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT | GL_TRANSFORM_BIT);
@@ -243,20 +270,22 @@ void ENG_API LRVGEngine::draw_text_overlay(int fb_width, int fb_height, const ch
     glMatrixMode(GL_MODELVIEW);
     glPushMatrix();
     glLoadIdentity();
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
     glDisable(GL_LIGHTING);
+    glDisable(GL_TEXTURE_2D);
+    glPixelZoom(1.0f, 1.0f);
     glColor3f(r, g, b);
-    char buffer[99999];
-    int num_quads = stb_easy_font_print((float)x, (float)y, (char*)text, NULL, buffer, sizeof(buffer));
-    if (num_quads > 0) {
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(2, GL_FLOAT, 16, buffer);
-        glDrawArrays(GL_QUADS, 0, num_quads * 4);
-        glDisableClientState(GL_VERTEX_ARRAY);
-    }
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(2, GL_FLOAT, 16, vbuf.data());
+    glDrawArrays(GL_QUADS, 0, num_quads * 4);
+    glDisableClientState(GL_VERTEX_ARRAY);
     glPopMatrix();
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
     glPopAttrib();
+    glMatrixMode(GL_MODELVIEW);
+
 }
 
 void ENG_API LRVGEngine::set_screen_text(const std::string text) {
@@ -281,11 +310,15 @@ void ENG_API LRVGEngine::set_active_camera(const std::shared_ptr<Camera> camera)
     LRVGEngine::active_camera = camera;
 }
 
-std::vector<std::pair<std::shared_ptr<Object>, glm::mat4>> LRVGEngine::build_render_list(const std::shared_ptr<Object> scene_root, const glm::mat4 parent_world_matrix) {
+std::vector<std::pair<std::shared_ptr<Object>, glm::mat4>> LRVGEngine::build_render_list(
+        const std::shared_ptr<Object> scene_root, 
+        const glm::mat4 parent_world_matrix
+) {
     std::vector<std::pair<std::shared_ptr<Object>, glm::mat4>> render_list;
     render_list.push_back(std::make_pair(scene_root, parent_world_matrix * scene_root->get_local_matrix()));
     for (const auto& child : scene_root->get_children()) {
-		std::vector<std::pair<std::shared_ptr<Object>, glm::mat4>> child_render_list = LRVGEngine::build_render_list(child, parent_world_matrix * scene_root->get_local_matrix());
+		std::vector<std::pair<std::shared_ptr<Object>, glm::mat4>> child_render_list = 
+            LRVGEngine::build_render_list(child, parent_world_matrix * scene_root->get_local_matrix());
 		render_list.insert(render_list.end(), child_render_list.begin(), child_render_list.end());
     }
     return render_list;
@@ -308,7 +341,6 @@ void ENG_API LRVGEngine::update() {
         LRVGEngine::fps = (float)LRVGEngine::frames;
         LRVGEngine::frames = 0;
         s_last_fps_time = now;
-        std::cout << "fps: " << LRVGEngine::fps << std::endl;
     }
 }
 
@@ -336,7 +368,7 @@ void ENG_API LRVGEngine::stop() {
 std::shared_ptr<Object> ENG_API LRVGEngine::find_obj_by_name(const std::string name) {
 	const auto obj = LRVGEngine::find_obj_by_name(name, LRVGEngine::scene);
     if (obj == nullptr) {
-        WARNING("object " << name << " not found");
+        WARNING("object %s not found", name.c_str());
 	}
 	return obj;
 }

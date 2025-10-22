@@ -7,44 +7,17 @@
  * @author	Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@student.supsi.ch]
  */
 
-#include "glm/fwd.hpp"
 #include <engine.h>
 #include <memory>
 #include <node.h>
-#include <glad/glad.h>
 #include <perspective_camera.h>
 #include <ortho_camera.h>
 #include <point_light.h>
 #include <cube.h>
-#include <iostream>
 
 std::shared_ptr<PerspectiveCamera> saved_camera = nullptr;
 bool perspective_camera_is_used = false;
 
-void gl_state() {
-    const unsigned char *v = glad_glGetString ? glad_glGetString(GL_VERSION) : glGetString(GL_VERSION);
-    const unsigned char *renderer = glad_glGetString ? glad_glGetString(GL_RENDERER) : glGetString(GL_RENDERER);
-    const unsigned char *vendor = glad_glGetString ? glad_glGetString(GL_VENDOR) : glGetString(GL_VENDOR);
-    std::cout << "GL VERSION: " << (v ? (const char*)v : "NULL") << "\n";
-    std::cout << "GL RENDERER: " << (renderer ? (const char*)renderer : "NULL") << "\n";
-    std::cout << "GL VENDOR: " << (vendor ? (const char*)vendor : "NULL") << "\n";
-    GLint viewport[4] = {0, 0, 0, 0};
-    if (glad_glGetIntegerv) glad_glGetIntegerv(GL_VIEWPORT, viewport);
-    else glGetIntegerv(GL_VIEWPORT, viewport);
-    std::cout << "VIEWPORT: " << viewport[0] << "," << viewport[1] << " " << viewport[2] << "x" << viewport[3] << "\n";
-    auto isEnabled = [](GLenum e){
-        GLboolean v = glad_glIsEnabled ? glad_glIsEnabled(e) : glIsEnabled(e);
-        return v == GL_TRUE ? "ENABLED" : "DISABLED";
-    };
-    std::cout << "DEPTH_TEST: " << isEnabled(GL_DEPTH_TEST) << "\n";
-    std::cout << "CULL_FACE: "  << isEnabled(GL_CULL_FACE)  << "\n";
-    GLint curprog = 0;
-    if (glad_glGetIntegerv) glad_glGetIntegerv(GL_CURRENT_PROGRAM, &curprog);
-    else glGetIntegerv(GL_CURRENT_PROGRAM, &curprog);
-    std::cout << "CURRENT_PROGRAM: " << curprog << "\n";
-    GLenum err = glad_glGetError ? glad_glGetError() : glGetError();
-    std::cout << "GL_ERROR (after init): 0x" << std::hex << err << std::dec << "\n";
-}
 
 /**
  * Application entry point.
@@ -86,7 +59,6 @@ int main() {
     root->add_child(cam);
     LRVGEngine::set_scene(root);
     LRVGEngine::set_active_camera(cam);
-    gl_state();
     while (LRVGEngine::is_running()) {
         LRVGEngine::update();
         LRVGEngine::clear_screen();
@@ -94,7 +66,6 @@ int main() {
         LRVGEngine::swap_buffers();
     }
     LRVGEngine::free();
-    std::cout << "exiting\n";
     return 0;
 }
 

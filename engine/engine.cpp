@@ -167,34 +167,34 @@ void ENG_API Engine::render() {
 	Engine::active_camera->set_window_size(Engine::window_width, Engine::window_height);
     int max_lights = 0;
 	glGetIntegerv(GL_MAX_LIGHTS, &max_lights);
-	//DEBUG("Max lights: %d", max_lights);
 	for (int i = 0; i < max_lights; i++) {
 	    glDisable(GL_LIGHT0 + i);
 	}
     auto render_list = Engine::build_render_list(Engine::scene, glm::mat4(1.0f));
     if (Engine::active_camera) {
-	    for (const auto& node : render_list) {
-	        if (node.first == Engine::active_camera) {
-	            Engine::active_camera->render(node.second);
-	            break;
-	        }
-	    }
-	}
-	std::sort(
-            render_list.begin(), 
-            render_list.end(), 
-            [](
-                const std::pair<std::shared_ptr<Object>, glm::mat4>& a, 
-                const std::pair<std::shared_ptr<Object>, glm::mat4>& b
-            ) {
-        return a.first->get_priority() < b.first->get_priority();
-	});
-	const glm::mat4 inv_camera_matrix = glm::inverse(Engine::active_camera->get_local_matrix());
+        for (const auto& node : render_list) {
+            if (node.first == Engine::active_camera) {
+                Engine::active_camera->render(node.second);
+                break;
+            }
+        }
+    }
+    std::sort(
+        render_list.begin(),
+        render_list.end(),
+        [](
+            const std::pair<std::shared_ptr<Object>, glm::mat4>& a,
+            const std::pair<std::shared_ptr<Object>, glm::mat4>& b
+        ) {
+            return a.first->get_priority() < b.first->get_priority();
+        }
+    );
+    const glm::mat4 inv_camera_matrix = glm::inverse(Engine::active_camera->get_local_matrix());
     for (const auto& node : render_list) {
         if (node.first == Engine::active_camera) continue;
-		node.first->render(inv_camera_matrix * node.second);
+        node.first->render(inv_camera_matrix * node.second);
     }
-
+    glEnable(GL_LIGHTING);
     glDepthFunc(GL_LEQUAL);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

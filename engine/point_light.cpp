@@ -38,7 +38,7 @@ void ENG_API PointLight::set_radius(const float radius) {
 void ENG_API PointLight::render(const glm::mat4 world_matrix) const {
 	Node::render(world_matrix);
 	glEnable(GL_LIGHT0 + this->light_id);
-	const glm::vec4 light_pos = world_matrix * glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+	const glm::vec4 light_pos(0.0f, 0.0f, 0.0f, 1.0f);
 	const glm::vec4 ambient(this->ambient_color, 1.0f);
 	const glm::vec4 diffuse(this->diffuse_color, 1.0f);
 	const glm::vec4 specular(this->specular_color, 1.0f);

@@ -43,7 +43,7 @@ ENG_API Light::Light() : Node() {
  * @return An integer representing the priority of the light.
  */
 int ENG_API Light::get_priority() const {
-	return 100; // Lights have high priority
+	return 100;
 }
 
 /**

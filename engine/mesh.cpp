@@ -92,12 +92,14 @@ bool ENG_API Mesh::get_cast_shadows() const {
 void ENG_API Mesh::render(const glm::mat4 world_matrix) const {
     Node::render(world_matrix);
     glPushMatrix();
+    if (this->material) this->material->render(world_matrix);
     this->material->render(world_matrix);
     glBegin(GL_TRIANGLES);
     for (const auto& face : this->faces) {
         const auto i0 = std::get<0>(face);
         const auto i1 = std::get<1>(face);
         const auto i2 = std::get<2>(face);
+        if (i0 >= this->vertices.size() || i1 >= this->vertices.size() || i2 >= this->vertices.size()) continue;
         const glm::vec3 &v0 = this->vertices[i0];
         const glm::vec3 &v1 = this->vertices[i1];
         const glm::vec3 &v2 = this->vertices[i2];
@@ -107,18 +109,16 @@ void ENG_API Mesh::render(const glm::mat4 world_matrix) const {
         const glm::vec2 &uv0 = this->uvs[i0];
         const glm::vec2 &uv1 = this->uvs[i1];
         const glm::vec2 &uv2 = this->uvs[i2];
-        glTexCoord2f(uv0.x, uv0.y);
         glNormal3f(n0.x, n0.y, n0.z);
+        glTexCoord2f(uv0.x, uv0.y);
         glVertex3f(v0.x, v0.y, v0.z);
-        glTexCoord2f(uv1.x, uv1.y);
         glNormal3f(n1.x, n1.y, n1.z);
+        glTexCoord2f(uv1.x, uv1.y);
         glVertex3f(v1.x, v1.y, v1.z);
-        glTexCoord2f(uv2.x, uv2.y);
         glNormal3f(n2.x, n2.y, n2.z);
+        glTexCoord2f(uv2.x, uv2.y);
         glVertex3f(v2.x, v2.y, v2.z);
     }
-    glVertexPointer(3, GL_FLOAT, 0, this->vertices.data());
-    glDrawElements(GL_TRIANGLES, 0, GL_UNSIGNED_INT, this->faces.data());
     glEnd();
     glPopMatrix();
 }

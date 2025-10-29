@@ -12,7 +12,7 @@ using namespace lrvg;
  * * Near Clipping Plane: 0.01 units
  * * Far Clipping Plane: 1000.0 units
  */
-ENG_API Camera::Camera() : Node() {
+ENG_API Camera::Camera() {
 	this->set_fov(90.0f);
 	this->set_clipping(0.01f, 1000.0f);
 	this->is_active = false;

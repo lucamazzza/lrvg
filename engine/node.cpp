@@ -16,7 +16,7 @@ using namespace lrvg;
  * * Rotation: (0, 0, 0)
  * * Scale: (1, 1, 1)
  */
-ENG_API Node::Node() : Object() {
+ENG_API Node::Node() {
 	this->set_base_matrix(glm::mat4(1.0f));
 	this->set_position(glm::vec3(0.0f, 0.0f, 0.0f));
 	this->set_rotation(glm::vec3(0.0f, 0.0f, 0.0f));

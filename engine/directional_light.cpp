@@ -15,8 +15,8 @@ using namespace lrvg;
  * 
  * * Direction: 0.0f, 1.0f, 0.0f (down)
  */
-ENG_API DirectionalLight::DirectionalLight() : Light() {
-	this->direction = glm::vec3(0.0f, -1.0f, 0.0f);
+ENG_API DirectionalLight::DirectionalLight() {
+	this->direction = glm::vec3(0.0f, -1.0f, 1.0f);
 }
 
 /**
@@ -39,7 +39,7 @@ void ENG_API DirectionalLight::set_direction(const glm::vec3 direction) {
 void ENG_API DirectionalLight::render(const glm::mat4 world_matrix) const {
 	Node::render(world_matrix);
 	glEnable(GL_LIGHT0 + this->light_id);
-	const glm::vec4 light_pos(this->direction, 1.0f);
+	const glm::vec4 light_pos(0.0f, 100.0f, 0.0f, 0.0f);
 	const glm::vec4 ambient(this->ambient_color, 1.0f);
 	const glm::vec4 diffuse(this->diffuse_color, 1.0f);
 	const glm::vec4 specular(this->specular_color, 1.0f);

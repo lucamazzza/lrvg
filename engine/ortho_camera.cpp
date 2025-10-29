@@ -19,7 +19,7 @@ using namespace lrvg;
  * @param zoom A float representing the desired zoom level.
  */
 void ENG_API OrthoCamera::set_zoom(float zoom) {
-	this->zoom = std::max(zoom, 0.1f);
+	this->zoom = std::max(zoom, 0.0f);
 }
 
 /**
@@ -41,15 +41,12 @@ float ENG_API OrthoCamera::get_zoom() const {
 void ENG_API OrthoCamera::render(const glm::mat4 world_matrix) const {
     if (!this->is_active) return;
     Node::render(world_matrix);
-    int fb_w = window_width; 
-    int fb_h = window_height;
-    if (fb_w <= 0 || fb_h <= 0) {
-        fb_w = 800;
-        fb_h = 600;
-    }
-    const float halfW = this->window_width * 0.5f;
-    const float halfH = this->window_height * 0.5f;
-    const glm::mat4 ortho_matrix = glm::ortho(-halfW, halfW, -halfH, halfH, this->near_clipping, this->far_clipping);
+    const float width = static_cast<float>(this->window_width);
+    const float height = static_cast<float>(this->window_height);
+    const float max = std::max(width, height);
+    const float w = (width / max) * (this->zoom);
+    const float h = (height / max) * (this->zoom);
+    const glm::mat4 ortho_matrix = glm::ortho(-w / 2.0f, w / 2.0f, -h / 2.0f, h / 2.0f, this->near_clipping, this->far_clipping);
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixf(glm::value_ptr(ortho_matrix));
 }

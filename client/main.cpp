@@ -7,15 +7,16 @@
  * @author	Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@student.supsi.ch]
  */
 
+#include <directional_light.h>
 #include <engine.h>
 #include <memory>
 #include <node.h>
 #include <perspective_camera.h>
 #include <ortho_camera.h>
-#include <directional_light.h>
 #include <cube.h>
 
-std::shared_ptr<lrvg::PerspectiveCamera> saved_camera = nullptr;
+std::shared_ptr<lrvg::PerspectiveCamera>    saved_persp_camera = nullptr;
+std::shared_ptr<lrvg::OrthoCamera>          saved_ortho_camera = nullptr;
 bool perspective_camera_is_used = false;
 
 /**
@@ -28,31 +29,37 @@ bool perspective_camera_is_used = false;
 int main() {
     auto root = std::make_shared<lrvg::Node>();
     lrvg::Engine::init("Hanoi", 800, 600);
-    //lrvg::Engine::vsync_enable();
     lrvg::Engine::set_sky_color(0.0f,0.0f,0.15f);
-    auto material = std::make_shared<lrvg::Material>();
-    material->set_ambient_color(glm::vec3(1, 0, 0));
-    material->set_diffuse_color(glm::vec3(1, 0, 0));
-    material->set_specular_color(glm::vec3(1, 0, 0));
     auto cube = std::make_shared<lrvg::Cube>();
     cube->set_name("MyCube");
-    cube->set_position(glm::vec3(0.0f, 0.0f, 0.0f));
-    cube->set_scale(glm::vec3(0.1f));
-    cube->set_rotation(glm::vec3(10,20,10));
-    cube->set_cast_shadows(true);
-    cube->set_material(material);
+    cube->set_position(glm::vec3(0.0f, 0.0f, -50.0f));
+    cube->set_rotation(glm::vec3(0.0f, 45.0f, 45.0f));
+    cube->set_scale(glm::vec3(30.0f));
+    cube->set_cast_shadows(false);
     root->add_child(cube);
     auto light = std::make_shared<lrvg::DirectionalLight>();
-    light->set_position(glm::vec3(0.0f, 0.0f, 3.0f));
-    light->set_direction(glm::vec3(0.0f, 0.0f, -1.0f));
+    light->set_name("Main Light");
+    light->set_base_matrix(glm::mat4(1.0f));
+    light->set_position(glm::vec3(0.0f, 100.0f, 0.0f));
+    light->set_direction(glm::vec3(0.0f, -1.0f, 0.0f));
     root->add_child(light);
-    auto cam = std::make_shared<lrvg::PerspectiveCamera>();
-    cam->set_fov(12.0f);
-    cam->set_position(glm::vec3(0.0f, 0.0f, 3.0f));
-    cam->set_rotation(glm::vec3(0.0f, 0.0f, 0.0f));
-    root->add_child(cam);
+    if (saved_ortho_camera == nullptr || saved_persp_camera == nullptr) {
+        std::shared_ptr<lrvg::OrthoCamera> camera_1 = std::make_shared<lrvg::OrthoCamera>();
+        camera_1->set_zoom(300.0f);
+        camera_1->set_name("Camera");
+        camera_1->set_position(glm::vec3(0.0f, 150.0f, 0.0f));
+        camera_1->set_rotation(glm::vec3(-90.0f, 0.0f, 0.0f));
+        std::shared_ptr<lrvg::PerspectiveCamera> camera_2 = std::make_shared<lrvg::PerspectiveCamera>();
+        camera_2->set_name("Camera 2");
+        camera_2->set_position(glm::vec3(0.0f, 123.0f, 55.0f));
+        camera_2->set_rotation(glm::vec3(-65.0f, 0.0f, 0.0f));
+        saved_ortho_camera = camera_1;
+        saved_persp_camera = camera_2;
+    }
+    root->add_child(saved_ortho_camera);
+    root->add_child(saved_persp_camera);
     lrvg::Engine::set_scene(root);
-    lrvg::Engine::set_active_camera(cam);
+    lrvg::Engine::set_active_camera(saved_ortho_camera);
     while (lrvg::Engine::is_running()) {
         lrvg::Engine::update();
         lrvg::Engine::clear_screen();

@@ -14,7 +14,7 @@ using namespace lrvg;
  * 
  * * Radius: 1.0f
  */
-ENG_API PointLight::PointLight() : Light() {
+ENG_API PointLight::PointLight() {
 	this->set_radius(1.0f);
 }
 
@@ -50,5 +50,5 @@ void ENG_API PointLight::render(const glm::mat4 world_matrix) const {
 	glLightfv(cur_light, GL_DIFFUSE, glm::value_ptr(diffuse));
 	glLightfv(cur_light, GL_SPECULAR, glm::value_ptr(specular));
 	glLightfv(cur_light, GL_SPOT_CUTOFF, &cutoff);
-	glLightf(cur_light, GL_CONSTANT_ATTENUATION, const_attenuation);
+	glLightf (cur_light, GL_CONSTANT_ATTENUATION, const_attenuation);
 }

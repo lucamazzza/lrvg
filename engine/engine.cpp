@@ -71,7 +71,6 @@ bool ENG_API Engine::init(const std::string window_title, const int width, const
    }
    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-   glfwWindowHint(GLFW_DEPTH_BITS, 24);
    s_window = glfwCreateWindow(width, height, window_title.c_str(), nullptr, nullptr);
    if (!s_window) {
        ERROR("Failed to create GLFW window");
@@ -94,18 +93,13 @@ bool ENG_API Engine::init(const std::string window_title, const int width, const
    glfwSetFramebufferSizeCallback(s_window, glfw_framebuffer_size_callback);
    glfwSetKeyCallback(s_window, glfw_key_callback);
    glEnable(GL_DEPTH_TEST);
-   glDepthFunc(GL_LESS);
    glEnable(GL_NORMALIZE);
    glEnable(GL_LIGHTING);
-   glEnable(GL_LIGHT0);
-   glEnableClientState(GL_VERTEX_ARRAY);
    glEnable(GL_CULL_FACE);
-   glShadeModel(GL_SMOOTH);
    const glm::vec4 ambient(0.2f, 0.2f, 0.2f, 1.0f);
    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, glm::value_ptr(ambient));
    glLightModelf(GL_LIGHT_MODEL_LOCAL_VIEWER, 1.0f);
    FreeImage_Initialise();
-
    Engine::shadow_material->set_ambient_color(glm::vec3(0.0f, 0.0f, 0.0f));
    Engine::shadow_material->set_diffuse_color(glm::vec3(0.0f, 0.0f, 0.0f));
    Engine::shadow_material->set_specular_color(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -165,40 +159,27 @@ void ENG_API Engine::render() {
         return;
 	}
 	Engine::active_camera->set_window_size(Engine::window_width, Engine::window_height);
-    int max_lights = 0;
+    int max_lights;
 	glGetIntegerv(GL_MAX_LIGHTS, &max_lights);
 	for (int i = 0; i < max_lights; i++) {
 	    glDisable(GL_LIGHT0 + i);
 	}
     auto render_list = Engine::build_render_list(Engine::scene, glm::mat4(1.0f));
-    if (Engine::active_camera) {
-        for (const auto& node : render_list) {
-            if (node.first == Engine::active_camera) {
-                Engine::active_camera->render(node.second);
-                break;
-            }
-        }
-    }
     std::sort(
         render_list.begin(),
         render_list.end(),
         [](
-            const std::pair<std::shared_ptr<Object>, glm::mat4>& a,
-            const std::pair<std::shared_ptr<Object>, glm::mat4>& b
+            const std::pair<std::shared_ptr<Object>, glm::mat4> a,
+            const std::pair<std::shared_ptr<Object>, glm::mat4> b
         ) {
-            return a.first->get_priority() < b.first->get_priority();
+            return a.first->get_priority() > b.first->get_priority();
         }
     );
     const glm::mat4 inv_camera_matrix = glm::inverse(Engine::active_camera->get_local_matrix());
     for (const auto& node : render_list) {
-        if (node.first == Engine::active_camera) continue;
         node.first->render(inv_camera_matrix * node.second);
     }
-    glEnable(GL_LIGHTING);
     glDepthFunc(GL_LEQUAL);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glDepthMask(GL_FALSE);
     const glm::mat4 shadow_model_scale_matrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 0.05f, 1.0f));
     for (const auto& node : render_list) {
         std::shared_ptr<Mesh> mesh = std::dynamic_pointer_cast<Mesh>(node.first);
@@ -210,8 +191,7 @@ void ENG_API Engine::render() {
             mesh->set_material(original_material);
         }
     }
-    glDepthMask(GL_TRUE);
-    glDisable(GL_BLEND);
+    glDepthFunc(GL_LESS);
     std::stringstream fps;
     fps << Engine::fps << " fps";
     Engine::draw_text_overlay(
@@ -239,8 +219,6 @@ void ENG_API Engine::timer_callback(int val) {
     (void)val; 
 }
 
-
-
 void ENG_API Engine::resize_callback(const int width, const int height) {
     Engine::window_width = width;
 	Engine::window_height = height;
@@ -258,31 +236,18 @@ void ENG_API Engine::draw_text_overlay(int fb_width, int fb_height, const char *
     int num_quads = stb_easy_font_print((float)x, (float)y, (char*)text, NULL, vbuf.data(), (int)vbuf.size());
     if (num_quads <= 0) return;
     glClear(GL_DEPTH_BUFFER_BIT);
-    glDepthFunc(GL_LESS);
-    glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT | GL_TRANSFORM_BIT);
     glMatrixMode(GL_PROJECTION);
-    glPushMatrix();
     glm::mat4 ortho = glm::ortho(0.0f, (float)fb_width, (float)fb_height, 0.0f, -1.0f, 1.0f);
-    glLoadMatrixf(glm::value_ptr(ortho));
     glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glLoadIdentity();
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_CULL_FACE);
+    glLoadMatrixf(glm::value_ptr(ortho));
     glDisable(GL_LIGHTING);
-    glDisable(GL_TEXTURE_2D);
     glPixelZoom(1.0f, 1.0f);
     glColor3f(r, g, b);
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(2, GL_FLOAT, 16, vbuf.data());
     glDrawArrays(GL_QUADS, 0, num_quads * 4);
     glDisableClientState(GL_VERTEX_ARRAY);
-    glPopMatrix();
-    glMatrixMode(GL_PROJECTION);
-    glPopMatrix();
-    glPopAttrib();
-    glMatrixMode(GL_MODELVIEW);
-
+    glEnable(GL_LIGHTING);
 }
 
 void ENG_API Engine::set_screen_text(const std::string text) {

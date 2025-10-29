@@ -11,7 +11,7 @@ using namespace lrvg;
  * 
  * @param path The file path to the image to be loaded as a texture.
  */
-ENG_API Texture::Texture(const std::string path) : Object() {
+ENG_API Texture::Texture(const std::string path) {
     FIBITMAP* bmp = nullptr;
 	FREE_IMAGE_FORMAT fif = FreeImage_GetFileType(path.c_str(), 0);
 	if (fif == FIF_UNKNOWN) {

@@ -19,7 +19,7 @@ int Light::next_light_id = 0;
  * * Diffuse Color: (1.0, 1.0, 1.0) [White]
  * * Specular Color: (1.0, 1.0, 1.0) [White]
  */
-ENG_API Light::Light() : Node() {
+ENG_API Light::Light() {
 	int max_num_lights;
 	glGetIntegerv(GL_MAX_LIGHTS, &max_num_lights);
 	Light::next_light_id++;
@@ -30,7 +30,7 @@ ENG_API Light::Light() : Node() {
 		return;
 	}
 	const int cur_light = get_current_light(this->light_id);
-	this->set_ambient_color(glm::vec3(0.0f, 0.0f, 0.0f));
+	this->set_ambient_color(glm::vec3(1.0f, 1.0f, 1.0f));
 	this->set_diffuse_color(glm::vec3(1.0f, 1.0f, 1.0f));
 	this->set_specular_color(glm::vec3(1.0f, 1.0f, 1.0f));
 	glEnable(cur_light);

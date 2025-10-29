@@ -21,18 +21,9 @@ using namespace lrvg;
 void ENG_API PerspectiveCamera::render(const glm::mat4 world_matrix) const {
     if (!this->is_active) return;
     Node::render(world_matrix);
-    int fb_w = window_width;
-    int fb_h = window_height;
-    if (fb_w <= 0 || fb_h <= 0) {
-        fb_w = 800;
-        fb_h = 600;
-    }
-    const float aspect_ratio = static_cast<float>(fb_w) / static_cast<float>(fb_h);
+    const float aspect_ratio = static_cast<float>(this->window_width) / static_cast<float>(this->window_height);
     const glm::mat4 perspective_matrix =
         glm::perspective(glm::radians(this->fov), aspect_ratio, this->near_clipping, this->far_clipping);
     glMatrixMode(GL_PROJECTION);
     glLoadMatrixf(glm::value_ptr(perspective_matrix));
-   // const glm::mat4 view_matrix = glm::inverse(world_matrix);
-   // glMatrixMode(GL_MODELVIEW);
-   // glLoadMatrixf(glm::value_ptr(view_matrix));
 }

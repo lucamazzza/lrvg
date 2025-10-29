@@ -19,7 +19,7 @@ using namespace lrvg;
  * * Exponent: 8.0f
  * * Radius: 1.0f
  */
-ENG_API SpotLight::SpotLight() : Light() {
+ENG_API SpotLight::SpotLight() {
 	this->set_direction(glm::vec3(0.0f, 1.0f, 0.0f));
 	this->set_cutoff(45.0f);
 	this->set_exponent(8.0f);

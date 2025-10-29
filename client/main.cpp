@@ -7,13 +7,15 @@
  * @author	Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@student.supsi.ch]
  */
 
-#include <directional_light.h>
 #include <engine.h>
 #include <memory>
 #include <node.h>
 #include <perspective_camera.h>
 #include <ortho_camera.h>
 #include <cube.h>
+#include <sphere.h>
+#include <directional_light.h>
+#include <point_light.h>
 
 std::shared_ptr<lrvg::PerspectiveCamera>    saved_persp_camera = nullptr;
 std::shared_ptr<lrvg::OrthoCamera>          saved_ortho_camera = nullptr;
@@ -30,8 +32,8 @@ int main() {
     auto root = std::make_shared<lrvg::Node>();
     lrvg::Engine::init("Hanoi", 800, 600);
     lrvg::Engine::set_sky_color(0.0f,0.0f,0.15f);
-    auto cube = std::make_shared<lrvg::Cube>();
-    cube->set_name("MyCube");
+    auto cube = std::make_shared<lrvg::Sphere>();
+    cube->set_name("MySphere");
     cube->set_position(glm::vec3(0.0f, 0.0f, -50.0f));
     cube->set_rotation(glm::vec3(0.0f, 45.0f, 45.0f));
     cube->set_scale(glm::vec3(30.0f));
@@ -39,8 +41,7 @@ int main() {
     root->add_child(cube);
     auto light = std::make_shared<lrvg::DirectionalLight>();
     light->set_name("Main Light");
-    light->set_base_matrix(glm::mat4(1.0f));
-    light->set_position(glm::vec3(0.0f, 100.0f, 0.0f));
+    light->set_position(glm::vec3(0.0f, 100.0f, -50.0f));
     light->set_direction(glm::vec3(0.0f, -1.0f, 0.0f));
     root->add_child(light);
     if (saved_ortho_camera == nullptr || saved_persp_camera == nullptr) {
@@ -59,7 +60,7 @@ int main() {
     root->add_child(saved_ortho_camera);
     root->add_child(saved_persp_camera);
     lrvg::Engine::set_scene(root);
-    lrvg::Engine::set_active_camera(saved_ortho_camera);
+    lrvg::Engine::set_active_camera(saved_persp_camera);
     while (lrvg::Engine::is_running()) {
         lrvg::Engine::update();
         lrvg::Engine::clear_screen();

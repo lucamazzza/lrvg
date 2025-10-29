@@ -21,10 +21,10 @@ using namespace lrvg;
  */
 ENG_API Material::Material() : Object() {
 	this->set_emission_color(glm::vec3(0.0f, 0.0f, 0.0f));
-	this->set_ambient_color(glm::vec3(0.75f, 0.75f, 0.75f));
+	this->set_ambient_color(glm::vec3(0.2f, 0.2f, 0.2f));
 	this->set_diffuse_color(glm::vec3(0.75f, 0.75f, 0.75f));
-	this->set_specular_color(glm::vec3(0.75f, 0.75f, 0.75f));
-	this->set_shininess(64.0f);
+	this->set_specular_color(glm::vec3(0.5f, 0.5f, 0.5f));
+	this->set_shininess(128.0f);
 	this->set_texture(nullptr);
 }
 
@@ -92,10 +92,10 @@ void ENG_API Material::set_texture(const std::shared_ptr<Texture> texture) {
  */
 void ENG_API Material::render(const glm::mat4 world_matrix) const {
     glDisable(GL_TEXTURE_2D);
-	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION,  glm::value_ptr(this->emission_color));
-	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   glm::value_ptr(this->ambient_color));
-	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   glm::value_ptr(this->diffuse_color));
-	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  glm::value_ptr(this->specular_color));
+	glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION,  glm::value_ptr(glm::vec4(this->emission_color, 1.0f)));
+	glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT,   glm::value_ptr(glm::vec4(this->ambient_color, 1.0f)));
+	glMaterialfv(GL_FRONT_AND_BACK, GL_DIFFUSE,   glm::value_ptr(glm::vec4(this->diffuse_color, 1.0f)));
+	glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR,  glm::value_ptr(glm::vec4(this->specular_color, 1.0f)));
 	glMaterialf (GL_FRONT_AND_BACK, GL_SHININESS, this->shininess);
 	if (this->texture != nullptr) {
 		this->texture->render(world_matrix);

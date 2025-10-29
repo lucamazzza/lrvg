@@ -236,18 +236,34 @@ void ENG_API Engine::draw_text_overlay(int fb_width, int fb_height, const char *
     int num_quads = stb_easy_font_print((float)x, (float)y, (char*)text, NULL, vbuf.data(), (int)vbuf.size());
     if (num_quads <= 0) return;
     glClear(GL_DEPTH_BUFFER_BIT);
+    glDepthFunc(GL_LESS);
+    glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT | GL_TRANSFORM_BIT);
     glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
     glm::mat4 ortho = glm::ortho(0.0f, (float)fb_width, (float)fb_height, 0.0f, -1.0f, 1.0f);
-    glMatrixMode(GL_MODELVIEW);
     glLoadMatrixf(glm::value_ptr(ortho));
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
     glDisable(GL_LIGHTING);
+    glDisable(GL_TEXTURE_2D);
     glPixelZoom(1.0f, 1.0f);
     glColor3f(r, g, b);
     glEnableClientState(GL_VERTEX_ARRAY);
     glVertexPointer(2, GL_FLOAT, 16, vbuf.data());
     glDrawArrays(GL_QUADS, 0, num_quads * 4);
     glDisableClientState(GL_VERTEX_ARRAY);
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glPopAttrib();
+    glMatrixMode(GL_MODELVIEW);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
     glEnable(GL_LIGHTING);
+    glEnable(GL_TEXTURE_2D);
 }
 
 void ENG_API Engine::set_screen_text(const std::string text) {

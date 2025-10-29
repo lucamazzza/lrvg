@@ -94,6 +94,7 @@ void ENG_API Mesh::render(const glm::mat4 world_matrix) const {
     this->material->render(world_matrix);
     for (const auto& face : this->faces) {
         glBegin(GL_TRIANGLES);
+        glEnableClientState(GL_NORMAL_ARRAY);
         const glm::vec3 vertex_0 = this->vertices[std::get<0>(face)];
         const glm::vec3 vertex_1 = this->vertices[std::get<1>(face)];
         const glm::vec3 vertex_2 = this->vertices[std::get<2>(face)];

@@ -26,11 +26,15 @@ public:
 	glm::vec3 get_position() const;
 	glm::vec3 get_rotation() const;
 	glm::vec3 get_scale() const;
+    std::vector<std::shared_ptr<Node>> get_children() const;
+	void add_child(const std::shared_ptr<Node> child);
     void set_base_matrix(const glm::mat4 base_matrix);
     void set_position(const glm::vec3 position);
     void set_rotation(const glm::vec3 rotation);
     void set_scale(const glm::vec3 scale);
 	void render(const glm::mat4 world_matrix) const override;
+protected:
+	std::vector<std::shared_ptr<Node>> children;
 private:
 	glm::mat4 base_matrix;
 	glm::vec3 position;

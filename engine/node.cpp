@@ -60,6 +60,24 @@ void ENG_API Node::set_scale(const glm::vec3 scale) {
 }
 
 /**
+ * Retrieves the list of child nodes.
+ * 
+ * @return A vector of shared pointers to the child nodes.
+ */
+std::vector<std::shared_ptr<Node>> ENG_API Node::get_children() const {
+    return this->children;
+}
+
+/**
+ * Adds a child object to this node's list of children.
+ * 
+ * @param child A shared pointer to the child object to be added.
+ */
+void ENG_API Node::add_child(const std::shared_ptr<Node> child) {
+	this->children.push_back(child);
+}
+
+/**
  * Computes and returns the local transformation matrix of the node.
  * This matrix is calculated by combining the position, rotation, scale,
  * and base transformation matrix of the node.

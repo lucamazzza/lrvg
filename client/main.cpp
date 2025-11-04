@@ -2,8 +2,8 @@
  * @file	main.cpp
  * @brief	Client application (that uses the graphics engine)
  *
- * @author	Luca Mazza (C) SUPSI [luca.mazza@student.supsi.ch]
- * @author	Roeld Hoxha (C) SUPSI [roeld.hoxha@student.supsi.ch]
+ * @author	Luca Mazza          (C) SUPSI [luca.mazza@student.supsi.ch]
+ * @author	Roeld Hoxha         (C) SUPSI [roeld.hoxha@student.supsi.ch]
  * @author	Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@student.supsi.ch]
  */
 
@@ -32,7 +32,7 @@ int main() {
     auto root = std::make_shared<lrvg::Node>();
     lrvg::Engine::init("Hanoi", 800, 600);
     lrvg::Engine::set_sky_color(0.0f,0.0f,0.15f);
-    auto cube = std::make_shared<lrvg::Sphere>();
+    auto cube = std::make_shared<lrvg::Cube>();
     cube->set_name("MySphere");
     cube->set_position(glm::vec3(0.0f, 0.0f, -50.0f));
     cube->set_rotation(glm::vec3(0.0f, 45.0f, 45.0f));

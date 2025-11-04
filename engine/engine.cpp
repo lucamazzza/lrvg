@@ -25,7 +25,7 @@ using namespace lrvg;
 bool Engine::is_initialized_f = false;
 bool Engine::is_running_f = false;
 int Engine::window_id = 0;
-std::shared_ptr<Object> Engine::scene;
+std::shared_ptr<Node> Engine::scene;
 std::shared_ptr<Camera> Engine::active_camera;
 std::string Engine::screen_text;
 int Engine::window_width = 0;
@@ -270,11 +270,11 @@ void ENG_API Engine::set_screen_text(const std::string text) {
     Engine::screen_text = text;
 }
 
-std::shared_ptr<Object> ENG_API Engine::get_scene() {
+std::shared_ptr<Node> ENG_API Engine::get_scene() {
     return Engine::scene;
 }
 
-void ENG_API Engine::set_scene(const std::shared_ptr<Object> scene) {
+void ENG_API Engine::set_scene(const std::shared_ptr<Node> scene) {
     Engine::scene = scene;
 	Engine::active_camera = nullptr;
 }
@@ -288,11 +288,11 @@ void ENG_API Engine::set_active_camera(const std::shared_ptr<Camera> camera) {
     Engine::active_camera = camera;
 }
 
-std::vector<std::pair<std::shared_ptr<Object>, glm::mat4>> Engine::build_render_list(const std::shared_ptr<Object> scene_root, const glm::mat4 parent_world_matrix) {
-    std::vector<std::pair<std::shared_ptr<Object>, glm::mat4>> render_list;
+std::vector<std::pair<std::shared_ptr<Node>, glm::mat4>> Engine::build_render_list(const std::shared_ptr<Node> scene_root, const glm::mat4 parent_world_matrix) {
+    std::vector<std::pair<std::shared_ptr<Node>, glm::mat4>> render_list;
     render_list.push_back(std::make_pair(scene_root, parent_world_matrix * scene_root->get_local_matrix()));
     for (const auto& child : scene_root->get_children()) {
-		std::vector<std::pair<std::shared_ptr<Object>, glm::mat4>> child_render_list = Engine::build_render_list(child, parent_world_matrix * scene_root->get_local_matrix());
+		std::vector<std::pair<std::shared_ptr<Node>, glm::mat4>> child_render_list = Engine::build_render_list(child, parent_world_matrix * scene_root->get_local_matrix());
 		render_list.insert(render_list.end(), child_render_list.begin(), child_render_list.end());
     }
     return render_list;
@@ -347,7 +347,7 @@ std::shared_ptr<Object> ENG_API Engine::find_obj_by_name(const std::string name)
 	return obj;
 }
 
-std::shared_ptr<Object> Engine::find_obj_by_name(const std::string name, const std::shared_ptr<Object> root) {
+std::shared_ptr<Object> Engine::find_obj_by_name(const std::string name, const std::shared_ptr<Node> root) {
     for (const auto& child : root->get_children()) {
         if (child->get_name() == name) {
             return child;

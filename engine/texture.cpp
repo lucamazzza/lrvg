@@ -1,3 +1,12 @@
+/**
+ * @file	texture.cpp
+ * @brief	Spot light class implementation
+ *
+ * @author	Luca Mazza          (C) SUPSI [luca.mazza@student.supsi.ch]
+ * @author	Roeld Hoxha         (C) SUPSI [roeld.hoxha@student.supsi.ch]
+ * @author	Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@student.supsi.ch]
+ */
+
 #include "texture.h"
 
 #include <glad/glad.h>

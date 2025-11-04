@@ -1,9 +1,7 @@
 #include "object.h"
 
-#include <memory>
 #include <sstream>
 #include <string>
-#include <vector>
 
 #include <glm/glm.hpp>
 
@@ -30,24 +28,6 @@ ENG_API Object::Object() : id{ Object::next_id++ } {
  */
 int ENG_API Object::get_id() const {
 	return this->id;
-}
-
-/**
- * Adds a child object to this object's list of children.
- * 
- * @param child A shared pointer to the child object to be added.
- */
-void ENG_API Object::add_child(const std::shared_ptr<Object> child) {
-	this->children.push_back(child);
-}
-
-/**
- * Retrieves the list of child objects.
- * 
- * @return A vector of shared pointers to the child objects.
- */
-std::vector<std::shared_ptr<Object>> ENG_API Object::get_children() const {
-	return this->children;
 }
 
 /**

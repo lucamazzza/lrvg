@@ -17,6 +17,7 @@
 
 #include "common.h"
 #include "object.h"
+#include "node.h"
 #include "camera.h"
 #include "material.h"
 
@@ -42,8 +43,8 @@ public:
 	static void swap_buffers();
 	static void stop();
 	static void quit();
-	static std::shared_ptr<Object> get_scene();
-	static void set_scene(const std::shared_ptr<Object> scene);
+	static std::shared_ptr<Node> get_scene();
+	static void set_scene(const std::shared_ptr<Node> scene);
 	static void set_active_camera(const std::shared_ptr<Camera> camera);
 	static std::shared_ptr<Object> find_obj_by_name(const std::string name);
 	static void set_screen_text(const std::string text);
@@ -53,12 +54,12 @@ public:
     static void draw_text_overlay(int fb_width, int fb_height, const char* text, float x, float y, float r, float g, float b);
     static void get_window_size(int& width, int& height);
 private: 
-	static std::vector<std::pair<std::shared_ptr<Object>, glm::mat4>> build_render_list(const std::shared_ptr<Object>, const glm::mat4 par_world_matrix);
-	static std::shared_ptr<Object> find_obj_by_name(const std::string name, const std::shared_ptr<Object> root);
+	static std::vector<std::pair<std::shared_ptr<Node>, glm::mat4>> build_render_list(const std::shared_ptr<Node>, const glm::mat4 par_world_matrix);
+	static std::shared_ptr<Object> find_obj_by_name(const std::string name, const std::shared_ptr<Node> root);
 	static int window_id;
 	static int window_width;
 	static int window_height;
-	static std::shared_ptr<Object> scene;
+	static std::shared_ptr<Node> scene;
 	static std::shared_ptr<Camera> active_camera;
 	static std::shared_ptr<Material> shadow_material;
 	static std::string screen_text;

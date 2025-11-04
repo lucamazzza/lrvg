@@ -1,9 +1,9 @@
 /**
  * @file	cube.h
- * @brief	TODO:
+ * @brief	Cube mesh class definition
  *
- * @author	Luca Mazza (C) SUPSI [luca.mazza@student.supsi.ch]
- * @author	Roeld Hoxha (C) SUPSI [roeld.hoxha@student.supsi.ch]
+ * @author	Luca Mazza          (C) SUPSI [luca.mazza@student.supsi.ch]
+ * @author	Roeld Hoxha         (C) SUPSI [roeld.hoxha@student.supsi.ch]
  * @author	Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@student.supsi.ch]
  */
 

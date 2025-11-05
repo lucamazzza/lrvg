@@ -8,13 +8,14 @@
 #include <utility>
 #include <vector>
 #include <iostream>
+#include <Windows.h>
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 #include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
-#include <FreeImage.h>
+#include <FreeImage/FreeImage.h>
+#include <FreeImage/stb_easy_font.h>
 #include <source_location>
-#include <stb_easy_font.h>
 
 #include "common.h"
 #include "material.h"
@@ -42,7 +43,6 @@ static void glfw_framebuffer_size_callback(GLFWwindow* window, int width, int he
 static void glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 #ifdef _WINDOWS
-#include <Windows.h>
 int APIENTRY DllMain(HANDLE instDLL, DWORD reason, LPVOID _reserved) {
     switch (reason) {
     case DLL_PROCESS_ATTACH:
@@ -78,7 +78,7 @@ bool ENG_API Engine::init(const std::string window_title, const int width, const
        return false;
    }
    glfwMakeContextCurrent(s_window);
-   if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
+   if (!gladLoadGL(glfwGetProcAddress)) {
        ERROR("Failed to initialize GLAD");
        glfwDestroyWindow(s_window);
        glfwTerminate();

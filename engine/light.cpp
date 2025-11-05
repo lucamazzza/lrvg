@@ -9,7 +9,7 @@
 
 #include "light.h"
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 
 #include "common.h"
 

@@ -51,14 +51,14 @@
       <PreprocessorDefinitions>_DEBUG;ENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\dependencies\freeglut\include;..\dependencies\glm\include;..\dependencies\freeimage\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\dependencies\glm\include;..\dependencies\glfw\include;..\dependencies\glad\include;..\dependencies\freeimage\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>..\dependencies\freeglut\lib\$(Platform)\$(Configuration);..\dependencies\freeimage\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FreeImageLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\dependencies\glfw\lib\x64\win;..\dependencies\freeimage\lib\x64\win;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;FreeImage.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -70,7 +70,7 @@
       <PreprocessorDefinitions>NDEBUG;ENGINE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\dependencies\freeglut\include;..\dependencies\glm\include;..\dependencies\freeimage\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\dependencies\glm\include;..\dependencies\glfw\include;..\dependencies\glad\include;..\dependencies\freeimage\include;..\dependencies\freeglut\include;..\dependencies\glm\include;..\dependencies\freeimage\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -78,16 +78,17 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>..\dependencies\freeglut\lib\$(Platform)\$(Configuration);..\dependencies\freeimage\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>FreeImageLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\dependencies\glfw\lib\x64\win;..\dependencies\freeimage\lib\x64\win;..\dependencies\freeglut\lib\$(Platform)\$(Configuration);..\dependencies\freeimage\lib\$(Platform)\$(Configuration);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;FreeImage.lib;FreeImageLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\dependencies\glad\src\gl.c" />
     <ClCompile Include="camera.cpp" />
     <ClCompile Include="cube.cpp" />
     <ClCompile Include="directional_light.cpp" />
+    <ClCompile Include="engine.cpp" />
     <ClCompile Include="light.cpp" />
-    <ClCompile Include="lrvg_engine.cpp" />
     <ClCompile Include="material.cpp" />
     <ClCompile Include="mesh.cpp" />
     <ClCompile Include="node.cpp" />
@@ -104,6 +105,7 @@
     <ClInclude Include="common.h" />
     <ClInclude Include="cube.h" />
     <ClInclude Include="directional_light.h" />
+    <ClInclude Include="engine.h" />
     <ClInclude Include="lrvg_engine.h" />
     <ClInclude Include="light.h" />
     <ClInclude Include="material.h" />
@@ -129,4 +131,3 @@
     <Error Condition="!Exists('..\packages\freeglut.3.2.2.v140.1.0.0\build\freeglut.3.2.2.v140.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\freeglut.3.2.2.v140.1.0.0\build\freeglut.3.2.2.v140.props'))" />
   </Target>
 </Project>
-

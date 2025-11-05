@@ -13,7 +13,7 @@
 #include <tuple>
 #include <vector>
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 #include <glm/glm.hpp>
 
 #include "common.h"

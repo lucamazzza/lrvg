@@ -11,7 +11,7 @@
 
 #include <memory>
 
-#include <glad/glad.h>
+#include <glad/gl.h>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "texture.h"

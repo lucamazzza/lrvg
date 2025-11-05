@@ -50,7 +50,7 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\engine;..\dependencies\glm\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\dependencies\glm\include;..\engine;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -58,6 +58,9 @@
       <AdditionalLibraryDirectories>..\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>engine.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "..\dependencies\freeimage\lib\x64\win\FreeImage.dll" "$(OutDir)" /Y /I /D</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -68,7 +71,7 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\engine;..\dependencies\glm\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\dependencies\glm\include;..\engine;..\dependencies\glm\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -78,6 +81,9 @@
       <AdditionalLibraryDirectories>..\$(Platform)\$(Configuration)</AdditionalLibraryDirectories>
       <AdditionalDependencies>engine.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <PostBuildEvent>
+      <Command>xcopy "..\dependencies\freeimage\lib\x64\win\FreeImage.dll" "$(OutDir)" /Y /I /D</Command>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

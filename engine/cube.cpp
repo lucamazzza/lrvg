@@ -17,127 +17,72 @@
 using namespace lrvg;
 
 /**
- * Construct a unit cube (centered at origin) as a Mesh by supplying vertices,
- * indices (as triangle faces), normals and UVs to Mesh::set_mesh_data.
- */
-void Cube::render(const glm::mat4 world_matrix) const {
-	Mesh::render(world_matrix);
-}
-
-/**
  * Creates a new instance of Cube with predefined mesh data.
  * The cube is centered at the origin with a size of 1 unit in each dimension.
  */
 Cube::Cube() {
-    std::vector<glm::vec3> vertices = {
-        // Back face (-Z)
-        {  1.0f, -1.0f, -1.0f }, // 0
-        { -1.0f, -1.0f, -1.0f }, // 1
-        { -1.0f,  1.0f, -1.0f }, // 2
-        {  1.0f,  1.0f, -1.0f }, // 3
-
-        // Front face (+Z)
-        { -1.0f, -1.0f,  1.0f }, // 4
-        {  1.0f, -1.0f,  1.0f }, // 5
-        {  1.0f,  1.0f,  1.0f }, // 6
-        { -1.0f,  1.0f,  1.0f }, // 7
-
-        // Left face (-X)
-        { -1.0f, -1.0f, -1.0f }, // 8
-        { -1.0f, -1.0f,  1.0f }, // 9
-        { -1.0f,  1.0f,  1.0f }, // 10
-        { -1.0f,  1.0f, -1.0f }, // 11
-
-        // Right face (+X)
-        {  1.0f, -1.0f,  1.0f }, // 12
-        {  1.0f, -1.0f, -1.0f }, // 13
-        {  1.0f,  1.0f, -1.0f }, // 14
-        {  1.0f,  1.0f,  1.0f }, // 15
-
-        // Bottom face (-Y)
-        { -1.0f, -1.0f, -1.0f }, // 16
-        {  1.0f, -1.0f, -1.0f }, // 17
-        {  1.0f, -1.0f,  1.0f }, // 18
-        { -1.0f, -1.0f,  1.0f }, // 19
-
-        // Top face (+Y)
-        { -1.0f,  1.0f,  1.0f }, // 20
-        {  1.0f,  1.0f,  1.0f }, // 21
-        {  1.0f,  1.0f, -1.0f }, // 22
-        { -1.0f,  1.0f, -1.0f }  // 23
+    std::vector<glm::vec3> vertices;
+    std::vector<glm::vec3> normals;
+    std::vector<glm::vec2> uvs;
+    std::vector<std::tuple<uint32_t, uint32_t, uint32_t>> faces;
+    
+    // Define 6 faces with their normals
+    struct FaceDef {
+        glm::vec3 normal;
+        glm::vec3 v[4];  // 4 vertices in CCW order
     };
-	std::vector<glm::vec3> normals = {
-        // Back
-        {  0.0f,  0.0f, -1.0f },
-        {  0.0f,  0.0f, -1.0f },
-        {  0.0f,  0.0f, -1.0f },
-        {  0.0f,  0.0f, -1.0f },
-        // Front
-        {  0.0f,  0.0f,  1.0f },
-        {  0.0f,  0.0f,  1.0f },
-        {  0.0f,  0.0f,  1.0f },
-        {  0.0f,  0.0f,  1.0f },
-        // Left
-        { -1.0f,  0.0f,  0.0f },
-        { -1.0f,  0.0f,  0.0f },
-        { -1.0f,  0.0f,  0.0f },
-        { -1.0f,  0.0f,  0.0f },
-        // Right
-        {  1.0f,  0.0f,  0.0f },
-        {  1.0f,  0.0f,  0.0f },
-        {  1.0f,  0.0f,  0.0f },
-        {  1.0f,  0.0f,  0.0f },
-        // Bottom
-        {  0.0f, -1.0f,  0.0f },
-        {  0.0f, -1.0f,  0.0f },
-        {  0.0f, -1.0f,  0.0f },
-        {  0.0f, -1.0f,  0.0f },
-        // Top
-        {  0.0f,  1.0f,  0.0f },
-        {  0.0f,  1.0f,  0.0f },
-        {  0.0f,  1.0f,  0.0f },
-        {  0.0f,  1.0f,  0.0f }
+    
+    FaceDef faceDefs[6] = {
+        // Front (+Z)
+        { glm::vec3(0, 0, 1), {
+            glm::vec3(-1, -1,  1), glm::vec3( 1, -1,  1),
+            glm::vec3( 1,  1,  1), glm::vec3(-1,  1,  1)
+        }},
+        // Back (-Z)
+        { glm::vec3(0, 0, -1), {
+            glm::vec3( 1, -1, -1), glm::vec3(-1, -1, -1),
+            glm::vec3(-1,  1, -1), glm::vec3( 1,  1, -1)
+        }},
+        // Right (+X)
+        { glm::vec3(1, 0, 0), {
+            glm::vec3( 1, -1,  1), glm::vec3( 1, -1, -1),
+            glm::vec3( 1,  1, -1), glm::vec3( 1,  1,  1)
+        }},
+        // Left (-X)
+        { glm::vec3(-1, 0, 0), {
+            glm::vec3(-1, -1, -1), glm::vec3(-1, -1,  1),
+            glm::vec3(-1,  1,  1), glm::vec3(-1,  1, -1)
+        }},
+        // Top (+Y)
+        { glm::vec3(0, 1, 0), {
+            glm::vec3(-1,  1,  1), glm::vec3( 1,  1,  1),
+            glm::vec3( 1,  1, -1), glm::vec3(-1,  1, -1)
+        }},
+        // Bottom (-Y)
+        { glm::vec3(0, -1, 0), {
+            glm::vec3(-1, -1, -1), glm::vec3( 1, -1, -1),
+            glm::vec3( 1, -1,  1), glm::vec3(-1, -1,  1)
+        }}
     };
-    std::vector<glm::vec2> uvs = {
-        // Back
-        {0.0f, 0.0f},
-        {1.0f, 0.0f},
-        {1.0f, 1.0f},
-        {0.0f, 1.0f},
-        // Front
-        {0.0f, 0.0f},
-        {1.0f, 0.0f},
-        {1.0f, 1.0f},
-        {0.0f, 1.0f},
-        // Left
-        {0.0f, 0.0f},
-        {1.0f, 0.0f},
-        {1.0f, 1.0f},
-        {0.0f, 1.0f},
-        // Right
-        {0.0f, 0.0f},
-        {1.0f, 0.0f},
-        {1.0f, 1.0f},
-        {0.0f, 1.0f},
-        // Bottom
-        {0.0f, 0.0f},
-        {1.0f, 0.0f},
-        {1.0f, 1.0f},
-        {0.0f, 1.0f},
-        // Top
-        {0.0f, 0.0f},
-        {1.0f, 0.0f},
-        {1.0f, 1.0f},
-        {0.0f, 1.0f}
+    
+    glm::vec2 faceUVs[4] = {
+        glm::vec2(0, 0), glm::vec2(1, 0),
+        glm::vec2(1, 1), glm::vec2(0, 1)
     };
-    std::vector<std::tuple<uint32_t, uint32_t, uint32_t>> faces = {
-        { 0,  1,  2}, { 0,  2,  3},    
-        { 4,  5,  6}, { 4,  6,  7},    
-        { 8,  9, 10}, { 8, 10, 11},   
-        {12, 13, 14}, {12, 14, 15},
-        {16, 17, 18}, {16, 18, 19},
-        {20, 21, 22}, {20, 22, 23}
-    };
+    
+    uint32_t idx = 0;
+    for (int f = 0; f < 6; f++) {
+        for (int v = 0; v < 4; v++) {
+            vertices.push_back(faceDefs[f].v[v]);
+            normals.push_back(faceDefs[f].normal);
+            uvs.push_back(faceUVs[v]);
+        }
+        // Two triangles per face
+        faces.push_back(std::make_tuple(idx + 0, idx + 1, idx + 2));
+        faces.push_back(std::make_tuple(idx + 0, idx + 2, idx + 3));
+        idx += 4;
+    }
+    
 	this->set_mesh_data(vertices, faces, normals, uvs);
 	this->set_cast_shadows(true);
 }

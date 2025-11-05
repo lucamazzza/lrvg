@@ -25,7 +25,7 @@ using namespace lrvg;
  * * Direction: 0.0f, 1.0f, 0.0f (down)
  */
 ENG_API DirectionalLight::DirectionalLight() {
-	this->direction = glm::vec3(0.0f, -1.0f, 1.0f);
+	this->direction = glm::vec3(0.0f, 1.0f, 0.0f);
 }
 
 /**

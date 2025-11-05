@@ -96,9 +96,10 @@ bool ENG_API Engine::init(const std::string window_title, const int width, const
    glEnable(GL_NORMALIZE);
    glEnable(GL_LIGHTING);
    glEnable(GL_CULL_FACE);
+   glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
    const glm::vec4 ambient(0.2f, 0.2f, 0.2f, 1.0f);
-   glLightModelfv(GL_LIGHT_MODEL_AMBIENT, glm::value_ptr(ambient));
    glLightModelf(GL_LIGHT_MODEL_LOCAL_VIEWER, 1.0f);
+   glLightModelfv(GL_LIGHT_MODEL_AMBIENT, glm::value_ptr(ambient));
    FreeImage_Initialise();
    Engine::shadow_material->set_ambient_color(glm::vec3(0.0f, 0.0f, 0.0f));
    Engine::shadow_material->set_diffuse_color(glm::vec3(0.0f, 0.0f, 0.0f));

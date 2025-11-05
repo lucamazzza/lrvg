@@ -20,7 +20,6 @@ namespace lrvg {
 class ENG_API Cube : public Mesh {
 public:
     Cube();
-	void render(const glm::mat4 world_matrix) const override;
 };
 
 }

@@ -1,4 +1,27 @@
 #include "engine.h"
+#include "common.h"
+#include "material.h"
+#include "mesh.h"
+
+#ifdef _WIN32
+#include <Windows.h>
+
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
+{
+    switch (ul_reason_for_call)
+    {
+    case DLL_PROCESS_ATTACH:
+        break;
+    case DLL_PROCESS_DETACH:
+        break;
+    case DLL_THREAD_ATTACH:
+        break;
+    case DLL_THREAD_DETACH:
+        break;
+    }
+    return TRUE;
+}
+#endif 
 
 #include <algorithm>
 #include <cstdio>
@@ -8,7 +31,6 @@
 #include <utility>
 #include <vector>
 #include <iostream>
-#include <Windows.h>
 
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
@@ -17,9 +39,6 @@
 #include <FreeImage/stb_easy_font.h>
 #include <source_location>
 
-#include "common.h"
-#include "material.h"
-#include "mesh.h"
 
 using namespace lrvg;
 
@@ -42,17 +61,6 @@ static void (*s_keyboard_cb)(const unsigned char key, const int mouse_x, const i
 static void glfw_framebuffer_size_callback(GLFWwindow* window, int width, int height);
 static void glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
-#ifdef _WINDOWS
-int APIENTRY DllMain(HANDLE instDLL, DWORD reason, LPVOID _reserved) {
-    switch (reason) {
-    case DLL_PROCESS_ATTACH:
-        break;
-	case DLL_PROCESS_DETACH:
-        break;
-    }
-    return true;
-}
-#endif
 
 ENG_API Engine::~Engine() {
 #ifdef NDEBUG

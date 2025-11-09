@@ -34,8 +34,8 @@ ENG_API Light::Light() {
 	Light::next_light_id++;
 	this->light_id = Light::next_light_id % max_num_lights;
 	DEBUG("Light %d/%d created", this->light_id, max_num_lights);
-	if (this->light_id >= max_num_lights) {
-		WARNING("Maximum number of lights reached (%d)", max_num_lights);
+	if (UNLIKELY(this->light_id >= max_num_lights)) {
+		WARN("Maximum number of lights reached (%d)", max_num_lights);
 		return;
 	}
 	const int cur_light = get_current_light(this->light_id);

@@ -14,6 +14,7 @@
 #include <ortho_camera.h>
 #include <cube.h>
 #include <sphere.h>
+#include <plane.h>
 #include <directional_light.h>
 #include <point_light.h>
 
@@ -32,20 +33,25 @@ int main() {
     auto root = std::make_shared<lrvg::Node>();
     lrvg::Engine::init("Hanoi", 800, 600);
     lrvg::Engine::set_sky_color(0.0f,0.0f,0.15f);
-    auto cube = std::make_shared<lrvg::Cube>();
+    auto plane = std::make_shared<lrvg::Plane>();
+    plane->set_name("Ground");
+    plane->set_position(glm::vec3(0.0f, -50.0f, -50.0f));
+    plane->set_scale(glm::vec3(150.0f, 1.0f, 150.0f));
+    root->add_child(plane);
+    auto cube = std::make_shared<lrvg::Sphere>();
     cube->set_name("MySphere");
     cube->set_position(glm::vec3(0.0f, 0.0f, -50.0f));
-    cube->set_rotation(glm::vec3(45.0f, 30.0f, 30.0f));
+    cube->set_rotation(glm::vec3(0.0f, 30.0f, 0.0f));
     cube->set_scale(glm::vec3(30.0f));
     cube->set_cast_shadows(false);
     root->add_child(cube);
     auto light = std::make_shared<lrvg::DirectionalLight>();
     light->set_name("Main Light");
-    //light->set_position(glm::vec3(0.0f, 50.0f, -50.0f));
+    //light->set_position(glm::vec3(0.0f, 10.0f, 10.0f));
     //light->set_radius(2.0f);
     //light->set_direction(glm::vec3(0.0f, -1.0f, 0.0f));
     root->add_child(light);
-    if (saved_ortho_camera == nullptr || saved_persp_camera == nullptr) {
+    if (LIKELY(saved_ortho_camera == nullptr || saved_persp_camera == nullptr)) {
         std::shared_ptr<lrvg::OrthoCamera> camera_1 = std::make_shared<lrvg::OrthoCamera>();
         camera_1->set_zoom(300.0f);
         camera_1->set_name("Camera");
@@ -62,14 +68,13 @@ int main() {
     root->add_child(saved_persp_camera);
     lrvg::Engine::set_scene(root);
     lrvg::Engine::set_active_camera(saved_persp_camera);
-    while (lrvg::Engine::is_running()) {
+    while (LIKELY(lrvg::Engine::is_running())) {
         lrvg::Engine::update();
         lrvg::Engine::clear_screen();
         lrvg::Engine::render();
         lrvg::Engine::swap_buffers();
     }
     lrvg::Engine::free();
-    std::cout << "exiting\n";
     return 0;
 }
 

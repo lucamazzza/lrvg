@@ -10,6 +10,7 @@
 #pragma once
 
 #include <glm/glm.hpp>
+#include <vector>
 
 #include "common.h"
 #include "object.h"

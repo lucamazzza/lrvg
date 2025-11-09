@@ -31,7 +31,7 @@ using namespace lrvg;
 ENG_API Material::Material() : Object() {
 	this->set_emission_color(glm::vec3(0.0f, 0.0f, 0.0f));
 	this->set_ambient_color(glm::vec3(0.2f, 0.2f, 0.2f));
-	this->set_diffuse_color(glm::vec3(0.75f, 0.75f, 0.75f));
+	this->set_diffuse_color(glm::vec3(0.8f, 0.8f, 0.8f));
 	this->set_specular_color(glm::vec3(0.5f, 0.5f, 0.5f));
 	this->set_shininess(128.0f);
 	this->set_texture(nullptr);

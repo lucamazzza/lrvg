@@ -57,6 +57,9 @@
     <ClCompile Include="point_light.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="plane.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="..\dependencies\glad\src\gl.c">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -105,6 +108,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="point_light.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="plane.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="perspective_camera.h">

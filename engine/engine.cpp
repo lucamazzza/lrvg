@@ -31,14 +31,12 @@ BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReser
 #include <utility>
 #include <vector>
 #include <iostream>
-
 #include <glad/gl.h>
 #include <GLFW/glfw3.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <FreeImage/FreeImage.h>
 #include <FreeImage/stb_easy_font.h>
 #include <source_location>
-
 
 using namespace lrvg;
 
@@ -61,26 +59,25 @@ static void (*s_keyboard_cb)(const unsigned char key, const int mouse_x, const i
 static void glfw_framebuffer_size_callback(GLFWwindow* window, int width, int height);
 static void glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
-
 ENG_API Engine::~Engine() {
-#ifdef NDEBUG
+#ifndef NDEBUG
     DEBUG("%s invoked", std::source_location::current().function_name());
 #endif
 }
 
 bool ENG_API Engine::init(const std::string window_title, const int width, const int height) {
-   if (Engine::is_initialized_f) {
+   if (UNLIKELY(Engine::is_initialized_f)) {
       ERROR("engine already initialized");
       return false;
    }
-   if (!glfwInit()) {
+   if (UNLIKELY(!glfwInit())) {
        ERROR("Failed to initialize GLFW");
        return false;
    }
    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
    s_window = glfwCreateWindow(width, height, window_title.c_str(), nullptr, nullptr);
-   if (!s_window) {
+   if (UNLIKELY(!s_window)) {
        ERROR("Failed to create GLFW window");
        glfwTerminate();
        return false;
@@ -124,7 +121,7 @@ bool ENG_API Engine::init(const std::string window_title, const int width, const
 
 void ENG_API Engine::set_keyboard_callback(void (*new_keyboard_callback) (const unsigned char key, const int mouse_x, const int mouse_y)) {
     s_keyboard_cb = new_keyboard_callback;
-    if (s_window) {
+    if (LIKELY(s_window)) {
         glfwSetKeyCallback(s_window, glfw_key_callback);
     }
 }
@@ -134,7 +131,7 @@ void ENG_API Engine::set_sky_color(const float red, const float green, const flo
 }
 
 bool ENG_API Engine::is_running() {
-   if (!Engine::is_initialized_f) {
+   if (UNLIKELY(!Engine::is_initialized_f)) {
       ERROR("engine not initialized");
       return false;
    }
@@ -146,12 +143,12 @@ bool ENG_API Engine::is_running() {
 }
 
 bool ENG_API Engine::free() {
-   if (!Engine::is_initialized_f) {
+   if (UNLIKELY(!Engine::is_initialized_f)) {
       ERROR("engine not initialized");
       return false;
    }
    FreeImage_DeInitialise();
-   if (s_window) {
+   if (LIKELY(s_window)) {
        glfwDestroyWindow(s_window);
        s_window = nullptr;
    }
@@ -163,7 +160,7 @@ bool ENG_API Engine::free() {
 }
 
 void ENG_API Engine::render() {
-    if (Engine::scene == nullptr || Engine::active_camera == nullptr) {
+    if (UNLIKELY(Engine::scene == nullptr || Engine::active_camera == nullptr)) {
         ERROR("scene or active camera not set");
         return;
 	}
@@ -192,7 +189,7 @@ void ENG_API Engine::render() {
     const glm::mat4 shadow_model_scale_matrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 0.05f, 1.0f));
     for (const auto& node : render_list) {
         std::shared_ptr<Mesh> mesh = std::dynamic_pointer_cast<Mesh>(node.first);
-        if (mesh != nullptr && mesh->get_cast_shadows()) {
+        if (LIKELY(mesh != nullptr) && mesh->get_cast_shadows()) {
             const std::shared_ptr<Material> original_material = mesh->get_material();
             mesh->set_material(Engine::shadow_material);
             const glm::mat4 shadow_matrix = shadow_model_scale_matrix * node.second;
@@ -211,7 +208,7 @@ void ENG_API Engine::render() {
             1.0f,
             0.0f, 1.0f, 0.0f
     );
-    if (!Engine::screen_text.empty()) {
+    if (Engine::screen_text.empty()) {
         Engine::draw_text_overlay(
                 Engine::window_width, 
                 Engine::window_height,
@@ -232,7 +229,7 @@ void ENG_API Engine::resize_callback(const int width, const int height) {
     Engine::window_width = width;
 	Engine::window_height = height;
 	DEBUG("Window resized to %dx%d", width, height);
-    if (Engine::active_camera != nullptr) {
+    if (UNLIKELY(Engine::active_camera != nullptr)) {
         Engine::active_camera->set_window_size(Engine::window_width, Engine::window_height);
 	}
 	glViewport(0, 0, width, height);
@@ -240,10 +237,10 @@ void ENG_API Engine::resize_callback(const int width, const int height) {
 
 
 void ENG_API Engine::draw_text_overlay(int fb_width, int fb_height, const char *text, float x, float y, float r, float g, float b) {
-    if (!text) return;
+    if (UNLIKELY(!text)) return;
     static std::vector<char> vbuf(1 << 16);
     int num_quads = stb_easy_font_print((float)x, (float)y, (char*)text, NULL, vbuf.data(), (int)vbuf.size());
-    if (num_quads <= 0) return;
+    if (UNLIKELY(num_quads <= 0)) return;
     glClear(GL_DEPTH_BUFFER_BIT);
     glDepthFunc(GL_LESS);
     glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT | GL_TRANSFORM_BIT);
@@ -313,7 +310,7 @@ void ENG_API Engine::get_window_size(int &width, int &height) {
 }
 
 void ENG_API Engine::update() {
-    if (!Engine::is_initialized_f) {
+    if (UNLIKELY(!Engine::is_initialized_f)) {
        ERROR("engine not initialized");
        return;
     }
@@ -332,26 +329,26 @@ void ENG_API Engine::clear_screen() {
 }
 
 void ENG_API Engine::swap_buffers() {
-    if (s_window) {
+    if (LIKELY(s_window)) {
         glfwSwapBuffers(s_window);
     }
 }
 
 void ENG_API Engine::vsync_enable() {
-    if (s_window) {
+    if (LIKELY(s_window)) {
         glfwSwapInterval(1);
     }
 }
 
 void ENG_API Engine::stop() {
     Engine::is_running_f = false;
-    if (s_window) glfwSetWindowShouldClose(s_window, GLFW_TRUE);
+    if (LIKELY(s_window)) glfwSetWindowShouldClose(s_window, GLFW_TRUE);
 }
 
 std::shared_ptr<Object> ENG_API Engine::find_obj_by_name(const std::string name) {
 	const auto obj = Engine::find_obj_by_name(name, Engine::scene);
     if (obj == nullptr) {
-        WARNING("object %s not found", name.c_str());
+        WARN("object %s not found", name.c_str());
 	}
 	return obj;
 }
@@ -374,11 +371,11 @@ static void glfw_framebuffer_size_callback(GLFWwindow* /*window*/, int width, in
 }
 
 static void glfw_key_callback(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int /*mods*/) {
-    if (action != GLFW_PRESS) return;
-    if (!s_keyboard_cb) return;
+    if (UNLIKELY(action != GLFW_PRESS)) return;
+    if (UNLIKELY(!s_keyboard_cb)) return;
     const char* name = glfwGetKeyName(key, 0);
     unsigned char ascii = (name && name[0]) ? (unsigned char)name[0] : (unsigned char)key;
     double xpos = 0.0, ypos = 0.0;
-    if (s_window) glfwGetCursorPos(s_window, &xpos, &ypos);
+    if (LIKELY(s_window)) glfwGetCursorPos(s_window, &xpos, &ypos);
     s_keyboard_cb(ascii, (int)xpos, (int)ypos);
 }

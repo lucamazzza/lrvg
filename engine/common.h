@@ -68,8 +68,8 @@ typedef unsigned char bool;
 #define INLINE              __attribute__((always_inline)) inline
 #define UNREF               __attribute__((unused))
 #else
-#define LIKELY(x)           (void)(x)
-#define UNLIKELY(x)         (void)(x)
+#define LIKELY(x)           (x)
+#define UNLIKELY(x)         (x)
 #define INLINE              inline
 #define UNREF
 #endif

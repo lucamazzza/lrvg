@@ -8,12 +8,12 @@
  */
 
 #pragma once
+#include "common.h"
+#include "object.h"
 
 #include <glm/glm.hpp>
 #include <vector>
-
-#include "common.h"
-#include "object.h"
+#include <memory>
 
 namespace lrvg {
 

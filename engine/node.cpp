@@ -1,10 +1,11 @@
 #include "node.h"
+#include "common.h"
 
 #include <glad/gl.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "common.h"
+
 
 using namespace lrvg;
 

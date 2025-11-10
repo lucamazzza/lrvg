@@ -24,6 +24,7 @@ class ENG_API Object {
 public:
 	Object();
 	Object(const std::string name);
+    virtual ~Object() = default;
 	int get_id() const;
     std::string get_name() const;
     void set_name(const std::string name);

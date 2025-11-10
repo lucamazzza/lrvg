@@ -20,6 +20,7 @@ namespace lrvg {
 class ENG_API Light : public Node {
 public:
 	Light();
+    virtual ~Light() = default;
 	int get_priority() const override;
 	void set_ambient_color(const glm::vec3 color);
 	void set_diffuse_color(const glm::vec3 color);

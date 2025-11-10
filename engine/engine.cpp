@@ -59,12 +59,24 @@ static void (*s_keyboard_cb)(const unsigned char key, const int mouse_x, const i
 static void glfw_framebuffer_size_callback(GLFWwindow* window, int width, int height);
 static void glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
+/**
+ * Engine class destructor.
+ * C++11 std::source_location is used to log the function name.
+ */
 ENG_API Engine::~Engine() {
 #ifndef NDEBUG
     DEBUG("%s invoked", std::source_location::current().function_name());
 #endif
 }
 
+/**
+ * Initializes the engine.
+ *
+ * @param window_title the title of the application window
+ * @param width the width of the application window
+ * @param height the height of the application window
+ * @return true if the engine was initialized successfully, false otherwise
+ */
 bool ENG_API Engine::init(const std::string window_title, const int width, const int height) {
    if (UNLIKELY(Engine::is_initialized_f)) {
       ERROR("engine already initialized");
@@ -119,29 +131,11 @@ bool ENG_API Engine::init(const std::string window_title, const int width, const
    return true;
 }
 
-void ENG_API Engine::set_keyboard_callback(void (*new_keyboard_callback) (const unsigned char key, const int mouse_x, const int mouse_y)) {
-    s_keyboard_cb = new_keyboard_callback;
-    if (LIKELY(s_window)) {
-        glfwSetKeyCallback(s_window, glfw_key_callback);
-    }
-}
-
-void ENG_API Engine::set_sky_color(const float red, const float green, const float blue) {
-    glClearColor(red, green, blue, 1.0f);
-}
-
-bool ENG_API Engine::is_running() {
-   if (UNLIKELY(!Engine::is_initialized_f)) {
-      ERROR("engine not initialized");
-      return false;
-   }
-   glfwPollEvents();
-   if (s_window && glfwWindowShouldClose(s_window)) {
-       Engine::is_running_f = false;
-   }
-   return Engine::is_running_f;
-}
-
+/**
+ * Frees the engine resources.
+ *
+ * @return true if the engine was freed successfully, false otherwise
+ */
 bool ENG_API Engine::free() {
    if (UNLIKELY(!Engine::is_initialized_f)) {
       ERROR("engine not initialized");
@@ -159,6 +153,163 @@ bool ENG_API Engine::free() {
    return true;
 }
 
+/**
+ * GLFW framebuffer size callback.
+ * This function is called whenever the window is resized.
+ *
+ * @param width the new width of the framebuffer
+ * @param height the new height of the framebuffer
+ */
+void ENG_API Engine::resize_callback(const int width, const int height) {
+    Engine::window_width = width;
+	Engine::window_height = height;
+	DEBUG("Window resized to %dx%d", width, height);
+    if (UNLIKELY(Engine::active_camera != nullptr)) {
+        Engine::active_camera->set_window_size(Engine::window_width, Engine::window_height);
+	}
+	glViewport(0, 0, width, height);
+}
+
+/**
+ * GLFW timer callback.
+ * This function is called whenever the timer expires.
+ *
+ * @param val the timer value
+ */
+void ENG_API Engine::timer_callback(int val) {
+    (void)val; 
+}
+
+/**
+ * Sets the active camera.
+ *
+ * @param camera the camera to set as active
+ */
+void ENG_API Engine::set_active_camera(const std::shared_ptr<Camera> camera) {
+    if (Engine::active_camera != nullptr) {
+		Engine::active_camera->set_active(false);
+    }
+	camera->set_window_size(Engine::window_width, Engine::window_height);
+	camera->set_active(true);
+    Engine::active_camera = camera;
+}
+
+/**
+ * Sets the scene.
+ *
+ * @param scene the root node of the scene to set
+ */
+void ENG_API Engine::set_scene(const std::shared_ptr<Node> scene) {
+    Engine::scene = scene;
+	Engine::active_camera = nullptr;
+}
+
+/**
+ * Sets the sky color.
+ *
+ * @param red the red component of the sky color
+ * @param green the green component of the sky color
+ * @param blue the blue component of the sky color
+ */
+void ENG_API Engine::set_sky_color(const float red, const float green, const float blue) {
+    glClearColor(red, green, blue, 1.0f);
+}
+
+/**
+ * Sets the screen text.
+ *
+ * @param text the text to display on the screen
+ */
+void ENG_API Engine::set_screen_text(const std::string text) {
+    Engine::screen_text = text;
+}
+
+/**
+ * Sets the keyboard callback function.
+ *
+ * @param new_keyboard_callback the new keyboard callback function
+ */
+void ENG_API Engine::set_keyboard_callback(void (*new_keyboard_callback) (const unsigned char key, const int mouse_x, const int mouse_y)) {
+    s_keyboard_cb = new_keyboard_callback;
+    if (LIKELY(s_window)) {
+        glfwSetKeyCallback(s_window, glfw_key_callback);
+    }
+}
+
+/**
+ * Checks if the engine is running.
+ *
+ * @return true if the engine is running, false otherwise
+ */
+bool ENG_API Engine::is_running() {
+   if (UNLIKELY(!Engine::is_initialized_f)) {
+      ERROR("engine not initialized");
+      return false;
+   }
+   glfwPollEvents();
+   if (s_window && glfwWindowShouldClose(s_window)) {
+       Engine::is_running_f = false;
+   }
+   return Engine::is_running_f;
+}
+
+/**
+ * Enables vertical synchronization (VSync).
+ */
+void ENG_API Engine::vsync_enable() {
+    if (LIKELY(s_window)) {
+        glfwSwapInterval(1);
+    }
+}
+
+/**
+ * Gets the scene.
+ *
+ * @return the root node of the current scene
+ */
+std::shared_ptr<Node> ENG_API Engine::get_scene() {
+    return Engine::scene;
+}
+
+/**
+ * Gets the window size.
+ *
+ * @param width reference to store the window width
+ * @param height reference to store the window height
+ */
+void ENG_API Engine::get_window_size(int &width, int &height) {
+    width = Engine::window_width;
+    height = Engine::window_height;
+}
+
+/**
+ * Updates the engine state.
+ */
+void ENG_API Engine::update() {
+    if (UNLIKELY(!Engine::is_initialized_f)) {
+       ERROR("engine not initialized");
+       return;
+    }
+    glfwPollEvents();
+    double now = glfwGetTime();
+    if (s_last_fps_time <= 0.0) s_last_fps_time = now;
+    if (now - s_last_fps_time >= 1.0) {
+        Engine::fps = (float)Engine::frames;
+        Engine::frames = 0;
+        s_last_fps_time = now;
+    }
+}
+
+/**
+ * Clears the screen.
+ */
+void ENG_API Engine::clear_screen() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+/**
+ * Renders the scene.
+ */
 void ENG_API Engine::render() {
     if (UNLIKELY(Engine::scene == nullptr || Engine::active_camera == nullptr)) {
         ERROR("scene or active camera not set");
@@ -238,21 +389,41 @@ void ENG_API Engine::render() {
     Engine::frames++;
 }
 
-void ENG_API Engine::timer_callback(int val) {
-    (void)val; 
+/**
+ * Swaps the front and back buffers.
+ */
+void ENG_API Engine::swap_buffers() {
+    if (LIKELY(s_window)) {
+        glfwSwapBuffers(s_window);
+    }
 }
 
-void ENG_API Engine::resize_callback(const int width, const int height) {
-    Engine::window_width = width;
-	Engine::window_height = height;
-	DEBUG("Window resized to %dx%d", width, height);
-    if (UNLIKELY(Engine::active_camera != nullptr)) {
-        Engine::active_camera->set_window_size(Engine::window_width, Engine::window_height);
+/**
+ * Finds an object by name in the scene.
+ *
+ * @param name the name of the object to find
+ * @return a shared pointer to the found object, or nullptr if not found
+ */
+std::shared_ptr<Object> ENG_API Engine::find_obj_by_name(const std::string name) {
+	const auto obj = Engine::find_obj_by_name(name, Engine::scene);
+    if (obj == nullptr) {
+        WARN("object %s not found", name.c_str());
 	}
-	glViewport(0, 0, width, height);
+	return obj;
 }
 
-
+/**
+ * Draws text overlay on the screen.
+ *
+ * @param fb_width the width of the framebuffer
+ * @param fb_height the height of the framebuffer
+ * @param text the text to draw
+ * @param x the x position of the text
+ * @param y the y position of the text
+ * @param r the red component of the text color
+ * @param g the green component of the text color
+ * @param b the blue component of the text color
+ */
 void ENG_API Engine::draw_text_overlay(int fb_width, int fb_height, const char *text, float x, float y, float r, float g, float b) {
     if (UNLIKELY(!text)) return;
     static std::vector<char> vbuf(1 << 16);
@@ -289,28 +460,6 @@ void ENG_API Engine::draw_text_overlay(int fb_width, int fb_height, const char *
     glEnable(GL_TEXTURE_2D);
 }
 
-void ENG_API Engine::set_screen_text(const std::string text) {
-    Engine::screen_text = text;
-}
-
-std::shared_ptr<Node> ENG_API Engine::get_scene() {
-    return Engine::scene;
-}
-
-void ENG_API Engine::set_scene(const std::shared_ptr<Node> scene) {
-    Engine::scene = scene;
-	Engine::active_camera = nullptr;
-}
-
-void ENG_API Engine::set_active_camera(const std::shared_ptr<Camera> camera) {
-    if (Engine::active_camera != nullptr) {
-		Engine::active_camera->set_active(false);
-    }
-	camera->set_window_size(Engine::window_width, Engine::window_height);
-	camera->set_active(true);
-    Engine::active_camera = camera;
-}
-
 std::vector<std::pair<std::shared_ptr<Node>, glm::mat4>> Engine::build_render_list(const std::shared_ptr<Node> scene_root, const glm::mat4 parent_world_matrix) {
     std::vector<std::pair<std::shared_ptr<Node>, glm::mat4>> render_list;
     render_list.push_back(std::make_pair(scene_root, parent_world_matrix * scene_root->get_local_matrix()));
@@ -319,55 +468,6 @@ std::vector<std::pair<std::shared_ptr<Node>, glm::mat4>> Engine::build_render_li
 		render_list.insert(render_list.end(), child_render_list.begin(), child_render_list.end());
     }
     return render_list;
-}
-
-void ENG_API Engine::get_window_size(int &width, int &height) {
-    width = Engine::window_width;
-    height = Engine::window_height;
-}
-
-void ENG_API Engine::update() {
-    if (UNLIKELY(!Engine::is_initialized_f)) {
-       ERROR("engine not initialized");
-       return;
-    }
-    glfwPollEvents();
-    double now = glfwGetTime();
-    if (s_last_fps_time <= 0.0) s_last_fps_time = now;
-    if (now - s_last_fps_time >= 1.0) {
-        Engine::fps = (float)Engine::frames;
-        Engine::frames = 0;
-        s_last_fps_time = now;
-    }
-}
-
-void ENG_API Engine::clear_screen() {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
-void ENG_API Engine::swap_buffers() {
-    if (LIKELY(s_window)) {
-        glfwSwapBuffers(s_window);
-    }
-}
-
-void ENG_API Engine::vsync_enable() {
-    if (LIKELY(s_window)) {
-        glfwSwapInterval(1);
-    }
-}
-
-void ENG_API Engine::stop() {
-    Engine::is_running_f = false;
-    if (LIKELY(s_window)) glfwSetWindowShouldClose(s_window, GLFW_TRUE);
-}
-
-std::shared_ptr<Object> ENG_API Engine::find_obj_by_name(const std::string name) {
-	const auto obj = Engine::find_obj_by_name(name, Engine::scene);
-    if (obj == nullptr) {
-        WARN("object %s not found", name.c_str());
-	}
-	return obj;
 }
 
 std::shared_ptr<Object> Engine::find_obj_by_name(const std::string name, const std::shared_ptr<Node> root) {

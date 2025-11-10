@@ -22,6 +22,7 @@ namespace lrvg {
 class ENG_API Camera : public Node {
 public:
 	Camera();
+    virtual ~Camera() = default;
 	int get_priority() const override;
 	void set_window_size(const int width, const int height);
 	void set_fov(const float fov);

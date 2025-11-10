@@ -29,30 +29,27 @@ namespace lrvg {
 class ENG_API Engine final {
 public: 
 	Engine(Engine const &) = delete;
-	~Engine();
-	void operator=(Engine const &) = delete;
+    void operator=(Engine const &) = delete;
+    ~Engine();
 	static bool init(const std::string window_title, const int window_width, const int window_height);
-	static void run();
-	static void set_keyboard_callback(void(*keyboard_callback)(const unsigned char key, const int mouse_x, const int mouse_y));
-	static void set_sky_color(const float red, const float green, const float blue);
-	static bool is_running();
-	static void render();
-	static void timer_callback(int val);
-	static void update();
-	static void clear_screen();
-	static void swap_buffers();
-	static void stop();
-	static void quit();
-	static std::shared_ptr<Node> get_scene();
-	static void set_scene(const std::shared_ptr<Node> scene);
-	static void set_active_camera(const std::shared_ptr<Camera> camera);
-	static std::shared_ptr<Object> find_obj_by_name(const std::string name);
-	static void set_screen_text(const std::string text);
-	static bool free();
+    static bool free();
     static void resize_callback(const int width, const int height);
+    static void timer_callback(int val);
+    static void set_active_camera(const std::shared_ptr<Camera> camera);
+    static void set_scene(const std::shared_ptr<Node> scene);
+	static void set_sky_color(const float red, const float green, const float blue);
+    static void set_screen_text(const std::string text);
+    static void set_keyboard_callback(void(*keyboard_callback)(const unsigned char key, const int mouse_x, const int mouse_y));
+    static bool is_running();
     static void vsync_enable();
-    static void draw_text_overlay(int fb_width, int fb_height, const char* text, float x, float y, float r, float g, float b);
+    static std::shared_ptr<Node> get_scene();
     static void get_window_size(int& width, int& height);
+    static void update();
+    static void clear_screen();
+    static void render();
+	static void swap_buffers();
+	static std::shared_ptr<Object> find_obj_by_name(const std::string name);
+    static void draw_text_overlay(int fb_width, int fb_height, const char* text, float x, float y, float r, float g, float b);
 private: 
 	static std::vector<std::pair<std::shared_ptr<Node>, glm::mat4>> build_render_list(const std::shared_ptr<Node>, const glm::mat4 par_world_matrix);
 	static std::shared_ptr<Object> find_obj_by_name(const std::string name, const std::shared_ptr<Node> root);

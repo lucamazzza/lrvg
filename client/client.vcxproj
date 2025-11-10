@@ -59,7 +59,7 @@
       <AdditionalDependencies>engine.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>xcopy "..\dependencies\freeimage\lib\x64\win\FreeImage.dll" "$(OutDir)" /Y /I /D</Command>
+      <Command>xcopy "..\dependencies\freeimage\lib\FreeImage.dll" "$(OutDir)" /Y /I /D</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

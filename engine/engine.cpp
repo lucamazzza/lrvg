@@ -186,13 +186,30 @@ void ENG_API Engine::render() {
         node.first->render(inv_camera_matrix * node.second);
     }
     glDepthFunc(GL_LEQUAL);
-    const glm::mat4 shadow_model_scale_matrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 0.05f, 1.0f));
     for (const auto& node : render_list) {
         std::shared_ptr<Mesh> mesh = std::dynamic_pointer_cast<Mesh>(node.first);
         if (LIKELY(mesh != nullptr) && mesh->get_cast_shadows()) {
+            glm::vec3 object_pos = glm::vec3(node.second[3]);
+            float shadow_y = -1000.0f;
+            for (const auto& potential_receiver : render_list) {
+                std::shared_ptr<Mesh> receiver_mesh = std::dynamic_pointer_cast<Mesh>(potential_receiver.first);
+                if (receiver_mesh != nullptr && receiver_mesh != mesh) {
+                    glm::vec3 receiver_pos = glm::vec3(potential_receiver.second[3]);
+                    if (receiver_pos.y < object_pos.y && receiver_pos.y > shadow_y) {
+                        shadow_y = receiver_pos.y;
+                    }
+                }
+            }
+            const glm::mat4 shadow_projection = glm::mat4(
+                1.0f, 0.0f, 0.0f, 0.0f,
+                0.0f, 0.0f, 0.0f, shadow_y + 0.05,
+                0.0f, 0.0f, 1.0f, 0.0f,
+                0.0f, 0.0f, 0.0f, 1.0f
+            );
+            
             const std::shared_ptr<Material> original_material = mesh->get_material();
             mesh->set_material(Engine::shadow_material);
-            const glm::mat4 shadow_matrix = shadow_model_scale_matrix * node.second;
+            const glm::mat4 shadow_matrix = shadow_projection * node.second;
             mesh->render(inv_camera_matrix * shadow_matrix);
             mesh->set_material(original_material);
         }

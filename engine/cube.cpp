@@ -18,71 +18,52 @@ using namespace lrvg;
 
 /**
  * Creates a new instance of Cube with predefined mesh data.
- * The cube is centered at the origin with a size of 1 unit in each dimension.
+ * The cube is centered at the origin with a size of 2 units (from -1 to 1) in each dimension.
+ * 
+ * @param segments Number of subdivisions per face side (default: 1)
  */
-Cube::Cube() {
+Cube::Cube(int segments) {
     std::vector<glm::vec3> vertices;
     std::vector<glm::vec3> normals;
     std::vector<glm::vec2> uvs;
     std::vector<std::tuple<uint32_t, uint32_t, uint32_t>> faces;
-    
-    // Define 6 faces with their normals
-    struct FaceDef {
-        glm::vec3 normal;
-        glm::vec3 v[4];  // 4 vertices in CCW order
-    };
-    
-    FaceDef faceDefs[6] = {
-        // Front (+Z)
-        { glm::vec3(0, 0, 1), {
-            glm::vec3(-1, -1,  1), glm::vec3( 1, -1,  1),
-            glm::vec3( 1,  1,  1), glm::vec3(-1,  1,  1)
-        }},
-        // Back (-Z)
-        { glm::vec3(0, 0, -1), {
-            glm::vec3( 1, -1, -1), glm::vec3(-1, -1, -1),
-            glm::vec3(-1,  1, -1), glm::vec3( 1,  1, -1)
-        }},
-        // Right (+X)
-        { glm::vec3(1, 0, 0), {
-            glm::vec3( 1, -1,  1), glm::vec3( 1, -1, -1),
-            glm::vec3( 1,  1, -1), glm::vec3( 1,  1,  1)
-        }},
-        // Left (-X)
-        { glm::vec3(-1, 0, 0), {
-            glm::vec3(-1, -1, -1), glm::vec3(-1, -1,  1),
-            glm::vec3(-1,  1,  1), glm::vec3(-1,  1, -1)
-        }},
-        // Top (+Y)
-        { glm::vec3(0, 1, 0), {
-            glm::vec3(-1,  1,  1), glm::vec3( 1,  1,  1),
-            glm::vec3( 1,  1, -1), glm::vec3(-1,  1, -1)
-        }},
-        // Bottom (-Y)
-        { glm::vec3(0, -1, 0), {
-            glm::vec3(-1, -1, -1), glm::vec3( 1, -1, -1),
-            glm::vec3( 1, -1,  1), glm::vec3(-1, -1,  1)
-        }}
-    };
-    
-    glm::vec2 faceUVs[4] = {
-        glm::vec2(0, 0), glm::vec2(1, 0),
-        glm::vec2(1, 1), glm::vec2(0, 1)
-    };
-    
-    uint32_t idx = 0;
-    for (int f = 0; f < 6; f++) {
-        for (int v = 0; v < 4; v++) {
-            vertices.push_back(faceDefs[f].v[v]);
-            normals.push_back(faceDefs[f].normal);
-            uvs.push_back(faceUVs[v]);
+    auto generate_face = [&](glm::vec3 normal, glm::vec3 tangent, glm::vec3 bitangent, glm::vec3 origin) {
+        uint32_t base_idx = vertices.size();
+        for (int y = 0; y <= segments; y++) {
+            for (int x = 0; x <= segments; x++) {
+                float u = (float)x / segments;
+                float v = (float)y / segments;
+                glm::vec3 pos = origin + tangent * (u * 2.0f - 1.0f) + bitangent * (v * 2.0f - 1.0f);
+                vertices.push_back(pos);
+                normals.push_back(normal);
+                uvs.push_back(glm::vec2(u, v));
+            }
         }
-        // Two triangles per face
-        faces.push_back(std::make_tuple(idx + 0, idx + 1, idx + 2));
-        faces.push_back(std::make_tuple(idx + 0, idx + 2, idx + 3));
-        idx += 4;
-    }
+        for (int y = 0; y < segments; y++) {
+            for (int x = 0; x < segments; x++) {
+                uint32_t i0 = base_idx + y * (segments + 1) + x;
+                uint32_t i1 = i0 + 1;
+                uint32_t i2 = i0 + (segments + 1);
+                uint32_t i3 = i2 + 1;
+                
+                faces.push_back(std::make_tuple(i0, i1, i2));
+                faces.push_back(std::make_tuple(i2, i1, i3));
+            }
+        }
+    };
+    // Front (+Z)
+    generate_face(glm::vec3(0, 0, 1), glm::vec3(1, 0, 0), glm::vec3(0, 1, 0), glm::vec3(0, 0, 1));
+    // Back (-Z)
+    generate_face(glm::vec3(0, 0, -1), glm::vec3(-1, 0, 0), glm::vec3(0, 1, 0), glm::vec3(0, 0, -1));
+    // Right (+X)
+    generate_face(glm::vec3(1, 0, 0), glm::vec3(0, 0, -1), glm::vec3(0, 1, 0), glm::vec3(1, 0, 0));
+    // Left (-X)
+    generate_face(glm::vec3(-1, 0, 0), glm::vec3(0, 0, 1), glm::vec3(0, 1, 0), glm::vec3(-1, 0, 0));
+    // Top (+Y)
+    generate_face(glm::vec3(0, 1, 0), glm::vec3(1, 0, 0), glm::vec3(0, 0, -1), glm::vec3(0, 1, 0));
+    // Bottom (-Y)
+    generate_face(glm::vec3(0, -1, 0), glm::vec3(1, 0, 0), glm::vec3(0, 0, 1), glm::vec3(0, -1, 0));
     
-	this->set_mesh_data(vertices, faces, normals, uvs);
-	this->set_cast_shadows(true);
+    this->set_mesh_data(vertices, faces, normals, uvs);
+    this->set_cast_shadows(true);
 }

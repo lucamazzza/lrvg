@@ -19,7 +19,7 @@ namespace lrvg {
  */
 class ENG_API Plane : public Mesh {
 public:
-    Plane();
+    Plane(int segments = 80);
 };
 
 }

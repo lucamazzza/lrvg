@@ -32,7 +32,7 @@ Sphere::Sphere(int lat_segments, int lon_segments) {
 			float ys = cos(theta);
 			float zs = sin(theta) * sin(phi);
 			vertices.emplace_back(xs, ys, zs);
-			normals.emplace_back(xs, ys, zs); // unit sphere normals
+			normals.emplace_back(glm::normalize(glm::vec3(xs, ys, zs)));
 			uvs.emplace_back(u, 1.0f - v);
 		}
 	}
@@ -42,13 +42,10 @@ Sphere::Sphere(int lat_segments, int lon_segments) {
 			uint32_t i1 = i0 + 1;
 			uint32_t i2 = i0 + (lon_segments + 1);
 			uint32_t i3 = i2 + 1;
-			faces.emplace_back(i0, i2, i1);
-			faces.emplace_back(i1, i2, i3);
+			faces.emplace_back(i0, i1, i2);
+			faces.emplace_back(i2, i1, i3);
 		}
 	}
 	this->set_mesh_data(vertices, faces, normals, uvs);
-}
-
-void ENG_API Sphere::render(const glm::mat4 world_matrix) const {
-	Mesh::render(world_matrix);
+	this->set_cast_shadows(true);
 }

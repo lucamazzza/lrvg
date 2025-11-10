@@ -19,7 +19,7 @@ namespace lrvg {
  */
 class ENG_API Cube : public Mesh {
 public:
-    Cube();
+    Cube(int segments = 40);
 };
 
 }

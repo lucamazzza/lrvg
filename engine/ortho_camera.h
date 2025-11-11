@@ -21,6 +21,7 @@ namespace lrvg {
  */
 class ENG_API OrthoCamera : public Camera {
 public:
+	OrthoCamera();
 	float get_zoom() const;
     void set_zoom(float zoom);
 	void render(const glm::mat4 world_matrix) const override;

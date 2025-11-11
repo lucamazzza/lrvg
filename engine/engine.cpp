@@ -376,13 +376,20 @@ void ENG_API Engine::render() {
             1.0f,
             0.0f, 1.0f, 0.0f
     );
-    if (Engine::screen_text.empty()) {
+    if (!Engine::screen_text.empty()) {
+        int line_count = 1;
+        for (char c : Engine::screen_text) {
+            if (c == '\n') line_count++;
+        }
+        const float line_height = 10.0f;
+        const float bottom_padding = 10.0f;
+        float y = (float)Engine::window_height - bottom_padding - line_height * (line_count + 1);
         Engine::draw_text_overlay(
                 Engine::window_width, 
                 Engine::window_height,
                 Engine::screen_text.c_str(), 
-                16.0f, 
-                (float)(Engine::window_height - 50), 
+                10.0f, 
+                y, 
                 1.0f, 1.0f, 1.0f
         );
     }

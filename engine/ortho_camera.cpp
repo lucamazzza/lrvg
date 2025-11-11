@@ -22,6 +22,13 @@
 using namespace lrvg;
 
 /**
+ * Creates a new instance of OrthoCamera with default zoom level.
+ */
+OrthoCamera::OrthoCamera() : Camera() {
+	this->zoom = 1.0f;
+}
+
+/**
  * Sets the zoom level of the orthographic camera.
  * The zoom level must be greater than or equal to 0.1 to avoid invalid projection matrices.
  * 

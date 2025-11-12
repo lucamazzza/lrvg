@@ -48,7 +48,8 @@ std::shared_ptr<Camera> Engine::active_camera;
 std::string Engine::screen_text;
 int Engine::window_width = 0;
 int Engine::window_height = 0;
-std::shared_ptr<Material> Engine::shadow_material = std::make_shared<Material>();
+unsigned int Engine::shadow_map_texture = 0;
+glm::vec3 Engine::light_position = glm::vec3(0.0f, 20.0f, 0.0f);
 
 int Engine::frames = 0;
 float Engine::fps = 0.0f;
@@ -118,10 +119,7 @@ bool ENG_API Engine::init(const std::string window_title, const int width, const
    glLightModelf(GL_LIGHT_MODEL_LOCAL_VIEWER, 1.0f);
    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, glm::value_ptr(ambient));
    FreeImage_Initialise();
-   Engine::shadow_material->set_ambient_color(glm::vec3(0.0f, 0.0f, 0.0f));
-   Engine::shadow_material->set_diffuse_color(glm::vec3(0.0f, 0.0f, 0.0f));
-   Engine::shadow_material->set_specular_color(glm::vec3(0.0f, 0.0f, 0.0f));
-   Engine::shadow_material->set_shininess(0.0f);
+   Engine::setup_shadow_map();
    DEBUG("%s initialized", LIB_NAME);
    Engine::is_initialized_f = true;
    Engine::is_running_f = true;
@@ -141,6 +139,7 @@ bool ENG_API Engine::free() {
       ERROR("engine not initialized");
       return false;
    }
+   Engine::cleanup_shadow_map();
    FreeImage_DeInitialise();
    if (LIKELY(s_window)) {
        glfwDestroyWindow(s_window);
@@ -234,6 +233,24 @@ void ENG_API Engine::set_keyboard_callback(void (*new_keyboard_callback) (const 
     if (LIKELY(s_window)) {
         glfwSetKeyCallback(s_window, glfw_key_callback);
     }
+}
+
+/**
+ * Sets the shadow light position.
+ *
+ * @param position the new light position
+ */
+void ENG_API Engine::set_shadow_light_position(const glm::vec3 position) {
+    Engine::light_position = position;
+}
+
+/**
+ * Gets the shadow light position.
+ *
+ * @return the current light position
+ */
+glm::vec3 ENG_API Engine::get_shadow_light_position() {
+    return Engine::light_position;
 }
 
 /**
@@ -332,40 +349,65 @@ void ENG_API Engine::render() {
             return a.first->get_priority() > b.first->get_priority();
         }
     );
+    
     const glm::mat4 inv_camera_matrix = glm::inverse(Engine::active_camera->get_local_matrix());
+    
+    // Render scene normally
     for (const auto& node : render_list) {
         node.first->render(inv_camera_matrix * node.second);
     }
-    glDepthFunc(GL_LEQUAL);
+    
+    // Render planar shadows for objects that cast shadows
+    glDisable(GL_LIGHTING);
+    glDisable(GL_TEXTURE_2D);
+    glDepthMask(GL_FALSE);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glColor4f(0.0f, 0.0f, 0.0f, 0.5f);
+    
+    // Shadow projection onto ground plane (y = -1)
+    float ground_y = -1.0f;
+    glm::vec3 light_dir = glm::normalize(glm::vec3(0.0f, 0.0f, 0.0f) - Engine::light_position);
+    
     for (const auto& node : render_list) {
         std::shared_ptr<Mesh> mesh = std::dynamic_pointer_cast<Mesh>(node.first);
-        if (LIKELY(mesh != nullptr) && mesh->get_cast_shadows()) {
-            glm::vec3 object_pos = glm::vec3(node.second[3]);
-            float shadow_y = -1000.0f;
-            for (const auto& potential_receiver : render_list) {
-                std::shared_ptr<Mesh> receiver_mesh = std::dynamic_pointer_cast<Mesh>(potential_receiver.first);
-                if (receiver_mesh != nullptr && receiver_mesh != mesh) {
-                    glm::vec3 receiver_pos = glm::vec3(potential_receiver.second[3]);
-                    if (receiver_pos.y < object_pos.y && receiver_pos.y > shadow_y) {
-                        shadow_y = receiver_pos.y;
-                    }
-                }
-            }
-            const glm::mat4 shadow_projection = glm::mat4(
-                1.0f, 0.0f, 0.0f, 0.0f,
-                0.0f, 0.0f, 0.0f, shadow_y + 0.05,
-                0.0f, 0.0f, 1.0f, 0.0f,
-                0.0f, 0.0f, 0.0f, 1.0f
-            );
+        if (mesh != nullptr && mesh->get_cast_shadows()) {
+            glm::vec3 obj_pos = glm::vec3(node.second[3]);
             
-            const std::shared_ptr<Material> original_material = mesh->get_material();
-            mesh->set_material(Engine::shadow_material);
-            const glm::mat4 shadow_matrix = shadow_projection * node.second;
-            mesh->render(inv_camera_matrix * shadow_matrix);
-            mesh->set_material(original_material);
+            // Calculate shadow projection matrix
+            float d = ground_y - Engine::light_position.y;
+            glm::mat4 shadow_proj(1.0f);
+            shadow_proj[0][0] = d - light_dir.x * light_dir.x;
+            shadow_proj[0][1] = -light_dir.x * light_dir.y;
+            shadow_proj[0][2] = -light_dir.x * light_dir.z;
+            shadow_proj[0][3] = 0;
+            
+            shadow_proj[1][0] = -light_dir.y * light_dir.x;
+            shadow_proj[1][1] = d - light_dir.y * light_dir.y;
+            shadow_proj[1][2] = -light_dir.y * light_dir.z;
+            shadow_proj[1][3] = 0;
+            
+            shadow_proj[2][0] = -light_dir.z * light_dir.x;
+            shadow_proj[2][1] = -light_dir.z * light_dir.y;
+            shadow_proj[2][2] = d - light_dir.z * light_dir.z;
+            shadow_proj[2][3] = 0;
+            
+            shadow_proj[3][0] = Engine::light_position.x * light_dir.x;
+            shadow_proj[3][1] = Engine::light_position.y * light_dir.y + d;
+            shadow_proj[3][2] = Engine::light_position.z * light_dir.z;
+            shadow_proj[3][3] = d;
+            
+            glPushMatrix();
+            glMultMatrixf(glm::value_ptr(inv_camera_matrix * shadow_proj * node.second));
+            mesh->render(glm::mat4(1.0f));
+            glPopMatrix();
         }
     }
-    glDepthFunc(GL_LESS);
+    
+    glDepthMask(GL_TRUE);
+    glDisable(GL_BLEND);
+    glEnable(GL_LIGHTING);
+    
     std::stringstream fps;
     fps << Engine::fps << " fps";
     Engine::draw_text_overlay(
@@ -467,11 +509,15 @@ void ENG_API Engine::draw_text_overlay(int fb_width, int fb_height, const char *
     glEnable(GL_TEXTURE_2D);
 }
 
-std::vector<std::pair<std::shared_ptr<Node>, glm::mat4>> Engine::build_render_list(const std::shared_ptr<Node> scene_root, const glm::mat4 parent_world_matrix) {
+std::vector<std::pair<std::shared_ptr<Node>, glm::mat4>> Engine::build_render_list(
+        const std::shared_ptr<Node> scene_root, 
+        const glm::mat4 parent_world_matrix
+        ) {
     std::vector<std::pair<std::shared_ptr<Node>, glm::mat4>> render_list;
     render_list.push_back(std::make_pair(scene_root, parent_world_matrix * scene_root->get_local_matrix()));
     for (const auto& child : scene_root->get_children()) {
-		std::vector<std::pair<std::shared_ptr<Node>, glm::mat4>> child_render_list = Engine::build_render_list(child, parent_world_matrix * scene_root->get_local_matrix());
+		std::vector<std::pair<std::shared_ptr<Node>, glm::mat4>> child_render_list = 
+            Engine::build_render_list(child, parent_world_matrix * scene_root->get_local_matrix());
 		render_list.insert(render_list.end(), child_render_list.begin(), child_render_list.end());
     }
     return render_list;
@@ -502,4 +548,170 @@ static void glfw_key_callback(GLFWwindow* /*window*/, int key, int /*scancode*/,
     double xpos = 0.0, ypos = 0.0;
     if (LIKELY(s_window)) glfwGetCursorPos(s_window, &xpos, &ypos);
     s_keyboard_cb(ascii, (int)xpos, (int)ypos);
+}
+
+/**
+ * Initializes the shadow map texture for shadow mapping.
+ * Uses glCopyTexImage2D approach compatible with OpenGL 2.1.
+ */
+void Engine::setup_shadow_map() {
+    glGenTextures(1, &Engine::shadow_map_texture);
+    glBindTexture(GL_TEXTURE_2D, Engine::shadow_map_texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Engine::shadow_map_size, Engine::shadow_map_size, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    DEBUG("Shadow map texture created with size %dx%d", Engine::shadow_map_size, Engine::shadow_map_size);
+}
+
+/**
+ * Cleans up shadow map resources.
+ */
+void Engine::cleanup_shadow_map() {
+    if (Engine::shadow_map_texture != 0) {
+        glDeleteTextures(1, &Engine::shadow_map_texture);
+        Engine::shadow_map_texture = 0;
+    }
+}
+
+/**
+ * Renders the scene from the light's perspective to capture depth information.
+ * For OpenGL 2.1 compatibility, we render to an RGB texture that represents
+ * brightness from the light's view (white = visible, dark = occluded).
+ *
+ * @param render_list List of objects to render
+ */
+void Engine::render_scene_to_shadow_map(const std::vector<std::pair<std::shared_ptr<Node>, glm::mat4>>& render_list) {
+    int saved_viewport[4];
+    glGetIntegerv(GL_VIEWPORT, saved_viewport);
+    
+    int shadow_caster_count = 0;
+    for (const auto& node : render_list) {
+        std::shared_ptr<Mesh> mesh = std::dynamic_pointer_cast<Mesh>(node.first);
+        if (mesh != nullptr && mesh->get_cast_shadows()) {
+            shadow_caster_count++;
+        }
+    }
+    
+    if (shadow_caster_count == 0) {
+        return;
+    }
+    
+    glViewport(0, 0, Engine::shadow_map_size, Engine::shadow_map_size);
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    glm::mat4 light_proj = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 1.0f, 50.0f);
+    glLoadMatrixf(glm::value_ptr(light_proj));
+    
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    glm::vec3 light_target(0.0f, 0.0f, 0.0f);
+    glm::mat4 light_view = glm::lookAt(Engine::light_position, light_target, glm::vec3(0.0f, 1.0f, 0.0f));
+    glLoadMatrixf(glm::value_ptr(light_view));
+    
+    glDisable(GL_LIGHTING);
+    glDisable(GL_TEXTURE_2D);
+    glColor3f(0.0f, 0.0f, 0.0f);
+    
+    for (const auto& node : render_list) {
+        std::shared_ptr<Mesh> mesh = std::dynamic_pointer_cast<Mesh>(node.first);
+        if (mesh != nullptr && mesh->get_cast_shadows()) {
+            glPushMatrix();
+            glMultMatrixf(glm::value_ptr(node.second));
+            mesh->render(glm::mat4(1.0f));
+            glPopMatrix();
+        }
+    }
+    
+    glBindTexture(GL_TEXTURE_2D, Engine::shadow_map_texture);
+    glCopyTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 0, 0, Engine::shadow_map_size, Engine::shadow_map_size, 0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    
+    glClearColor(0.0f, 0.0f, 0.15f, 1.0f);
+    glViewport(saved_viewport[0], saved_viewport[1], saved_viewport[2], saved_viewport[3]);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glEnable(GL_LIGHTING);
+}
+
+/**
+ * Applies shadows to the scene using projective texturing.
+ * This second pass darkens areas in shadow by rendering geometry
+ * with the depth texture projected from the light's perspective.
+ *
+ * @param render_list List of objects that can receive shadows
+ * @param inv_camera_matrix Inverse camera transformation matrix
+ */
+void Engine::apply_shadows(const std::vector<std::pair<std::shared_ptr<Node>, glm::mat4>>& render_list, const glm::mat4& inv_camera_matrix) {
+    glm::vec3 light_target(0.0f, 0.0f, 0.0f);
+    glm::mat4 light_view = glm::lookAt(Engine::light_position, light_target, glm::vec3(0.0f, 1.0f, 0.0f));
+    glm::mat4 light_proj = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 1.0f, 50.0f);
+    glm::mat4 bias_matrix(
+        0.5f, 0.0f, 0.0f, 0.0f,
+        0.0f, 0.5f, 0.0f, 0.0f,
+        0.0f, 0.0f, 0.5f, 0.0f,
+        0.5f, 0.5f, 0.5f, 1.0f
+    );
+    glm::mat4 shadow_matrix = bias_matrix * light_proj * light_view;
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, Engine::shadow_map_texture);
+    glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    glMatrixMode(GL_TEXTURE);
+    glLoadMatrixf(glm::value_ptr(shadow_matrix));
+    glMatrixMode(GL_MODELVIEW);
+    GLfloat eye_plane_s[] = {1.0f, 0.0f, 0.0f, 0.0f};
+    GLfloat eye_plane_t[] = {0.0f, 1.0f, 0.0f, 0.0f};
+    GLfloat eye_plane_r[] = {0.0f, 0.0f, 1.0f, 0.0f};
+    GLfloat eye_plane_q[] = {0.0f, 0.0f, 0.0f, 1.0f};
+    glTexGeni(GL_S, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
+    glTexGeni(GL_T, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
+    glTexGeni(GL_R, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
+    glTexGeni(GL_Q, GL_TEXTURE_GEN_MODE, GL_EYE_LINEAR);
+    glTexGenfv(GL_S, GL_EYE_PLANE, eye_plane_s);
+    glTexGenfv(GL_T, GL_EYE_PLANE, eye_plane_t);
+    glTexGenfv(GL_R, GL_EYE_PLANE, eye_plane_r);
+    glTexGenfv(GL_Q, GL_EYE_PLANE, eye_plane_q);
+    glEnable(GL_TEXTURE_GEN_S);
+    glEnable(GL_TEXTURE_GEN_T);
+    glEnable(GL_TEXTURE_GEN_R);
+    glEnable(GL_TEXTURE_GEN_Q);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_ZERO, GL_SRC_COLOR);
+    glDepthFunc(GL_LEQUAL);
+    glDepthMask(GL_FALSE);
+    glDisable(GL_LIGHTING);
+    // Render ALL meshes to receive shadows (not just shadow casters)
+    for (const auto& node : render_list) {
+        std::shared_ptr<Mesh> mesh = std::dynamic_pointer_cast<Mesh>(node.first);
+        if (mesh != nullptr) {
+            glPushMatrix();
+            glMultMatrixf(glm::value_ptr(inv_camera_matrix * node.second));
+            glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+            mesh->render(glm::mat4(1.0f));
+            glPopMatrix();
+        }
+    }
+    glDepthMask(GL_TRUE);
+    glDepthFunc(GL_LESS);
+    glEnable(GL_LIGHTING);
+    glDisable(GL_BLEND);
+    glDisable(GL_TEXTURE_GEN_S);
+    glDisable(GL_TEXTURE_GEN_T);
+    glDisable(GL_TEXTURE_GEN_R);
+    glDisable(GL_TEXTURE_GEN_Q);
+    glMatrixMode(GL_TEXTURE);
+    glLoadIdentity();
+    glMatrixMode(GL_MODELVIEW);
+    glDisable(GL_TEXTURE_2D);
 }

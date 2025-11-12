@@ -130,7 +130,7 @@ int main() {
     saved_sphere = std::make_shared<lrvg::Sphere>();
     saved_sphere->set_name("Sphere");
     saved_sphere->set_position(glm::vec3(-2.0f, 0.0f, 0.0f));
-    saved_sphere->set_cast_shadows(false);
+    saved_sphere->set_cast_shadows(true);
     saved_sphere->set_material(saved_material);
     root->add_child(saved_sphere);
     saved_cube = std::make_shared<lrvg::Cube>();

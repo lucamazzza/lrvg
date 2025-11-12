@@ -40,6 +40,8 @@ public:
 	static void set_sky_color(const float red, const float green, const float blue);
     static void set_screen_text(const std::string text);
     static void set_keyboard_callback(void(*keyboard_callback)(const unsigned char key, const int mouse_x, const int mouse_y));
+    static void set_shadow_light_position(const glm::vec3 position);
+    static glm::vec3 get_shadow_light_position();
     static bool is_running();
     static void vsync_enable();
     static std::shared_ptr<Node> get_scene();
@@ -53,13 +55,19 @@ public:
 private: 
 	static std::vector<std::pair<std::shared_ptr<Node>, glm::mat4>> build_render_list(const std::shared_ptr<Node>, const glm::mat4 par_world_matrix);
 	static std::shared_ptr<Object> find_obj_by_name(const std::string name, const std::shared_ptr<Node> root);
+	static void setup_shadow_map();
+	static void cleanup_shadow_map();
+	static void render_scene_to_shadow_map(const std::vector<std::pair<std::shared_ptr<Node>, glm::mat4>>& render_list);
+	static void apply_shadows(const std::vector<std::pair<std::shared_ptr<Node>, glm::mat4>>& render_list, const glm::mat4& inv_camera_matrix);
 	static int window_id;
 	static int window_width;
 	static int window_height;
 	static std::shared_ptr<Node> scene;
 	static std::shared_ptr<Camera> active_camera;
-	static std::shared_ptr<Material> shadow_material;
 	static std::string screen_text;
+	static unsigned int shadow_map_texture;
+	static const int shadow_map_size = 512;
+	static glm::vec3 light_position;
 	static int frames;
 	static float fps;
 	static bool is_initialized_f;

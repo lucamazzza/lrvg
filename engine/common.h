@@ -9,10 +9,11 @@
 
 #pragma once
 
-#define LIB_NAME            "LRVGEngine"
+#define LIB_NAME            "LRVG"
 #define LIB_VERSION_MAJOR   "0"
 #define LIB_VERSION_MINOR   "1"
 #define LIB_VERSION_PATCH   "0"
+#define LIB_VERSION         LIB_VERSION_MAJOR "." LIB_VERSION_MINOR "." LIB_VERSION_PATCH
 #define LIB_VERSION_STRING  LIB_NAME " v" LIB_VERSION_MAJOR "." LIB_VERSION_MINOR "." LIB_VERSION_PATCH
 #ifndef BUILD_DATE
 #define BUILD_DATE          0

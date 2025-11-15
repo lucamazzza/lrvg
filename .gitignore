@@ -362,9 +362,6 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-<<<<<<< HEAD
-#clang
-=======
 # VS Code files for those working on multiple tools
 .vscode/*
 !.vscode/settings.json
@@ -392,5 +389,5 @@ FodyWeavers.xsd
 # End of https://www.toptal.com/developers/gitignore/api/visualstudio,c++,codeblocks
 
 ### NON Visual Studio ###
->>>>>>> feat/scene-graph
 compile_commands.json
+engine/docs/

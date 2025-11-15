@@ -5,18 +5,20 @@ What is it?
 -----------
 
     LRVG Engine is a graphics rendering engine written in C++. It provides core
-    functionalities for 3D graphics applications, including scene graph management,
-    camera systems (perspective & orthographic), and object rendering.
+    functionalities for 3D graphics applications, including scene graph 
+    management, camera systems (perspective & orthographic), and object 
+    rendering.
 
-    The project is structured as a library (engine) and a client application demo,
-    that demonstrates the engine capabilities, through a "tower of Hanoi" game 
-    implementation.
+    The project is structured as a library (engine) and a client application
+    demo, that demonstrates the engine capabilities, through a "tower of Hanoi"
+    game implementation.
 
 On what hardware does it run?
 -----------------------------
 
-    The engine has been developed in parallel on `aarch64` macOS and `x86_64` Microsoft
-    Windows, so the software library is certified to run on those platforms.
+    The engine has been developed in parallel on `aarch64` macOS and `x86_64`
+    Microsoft Windows, so the software library is certified to run on those
+    platforms.
 
     By using `GLFW3` and vendoring all its dependencies, the engine has very few
     prerequisites and needs, in order to be used:
@@ -69,8 +71,8 @@ If something goes wrong
    - Your compiler supports C++20 or later
    - The Makefile paths are correct for your system
 
-  For Windows builds, ensure the preprocessor definition ENGINE_EXPORTS is
-  set when building the engine library to properly export symbols.
+  For Windows builds, ensure the preprocessor definition ENGINE_EXPORTS is set
+  when building the engine library to properly export symbols.
 
 Copyright
 ---------

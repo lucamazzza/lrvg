@@ -62,7 +62,7 @@ Installation
   Debug builds will include "(debug)" in the library name string.
 
 If something goes wrong
-------------------------
+-----------------------
 
   Check that:
    - All dependencies are properly included in the dependencies/ directory

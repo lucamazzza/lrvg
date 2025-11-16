@@ -1,4 +1,86 @@
 LRVG Engine
 ===========
 
+What is it?
+-----------
 
+    LRVG Engine is a graphics rendering engine written in C++. It provides core
+    functionalities for 3D graphics applications, including scene graph 
+    management, camera systems (perspective & orthographic), and object 
+    rendering.
+
+    The project is structured as a library (engine) and a client application
+    demo, that demonstrates the engine capabilities, through a "tower of Hanoi"
+    game implementation.
+
+On what hardware does it run?
+-----------------------------
+
+    The engine has been developed in parallel on `aarch64` macOS and `x86_64`
+    Microsoft Windows, so the software library is certified to run on those
+    platforms.
+
+    By using `GLFW3` and vendoring all its dependencies, the engine has very few
+    prerequisites and needs, in order to be used:
+    - C++20 compatible compiler (`g++` is advised)
+    - Standard C++ libraries
+
+Documentation
+-------------
+
+  There is Doxygen documentation support in the engine/ directory.
+  To build the documentation, cd into engine/ and run `doxygen Doxyfile`.
+  The generated HTML and LaTeX documentation will be placed in the docs/ 
+  subdirectory.
+
+  The main header file engine/engine.h contains the core API definitions.
+  Additional documentation can be found in the individual header files:
+   - camera.h               Camera base class
+   - perspective_camera.h   Perspective projection camera
+   - ortho_camera.h         Orthographic projection camera
+   - node.h                 Scene graph node
+   - object.h               Renderable object
+
+Installation
+------------
+
+  To compile the engine and client application, you need to have the
+  dependencies properly installed. Please read the dependencies/ directory
+  for information on required libraries.
+
+  Building is straightforward:
+   - "make all" builds both the engine library and client application
+   - "make build_engine" builds only the engine library
+   - "make build_client" builds only the client (requires engine)
+   - "make clean" removes all build artifacts
+
+  The Makefile at the top level will invoke the appropriate makefiles in
+  the engine/ and client/ subdirectories.
+
+  For Windows users, Visual Studio project files (*.vcxproj) and Code::Blocks
+  project files (*.cbp) are provided in both directories.
+
+  The engine library version is defined in engine/common.h as LIB_VERSION.
+  Debug builds will include "(debug)" in the library name string.
+
+If something goes wrong
+-----------------------
+
+  Check that:
+   - All dependencies are properly included in the dependencies/ directory
+   - Your compiler supports C++20 or later
+   - The Makefile paths are correct for your system
+
+  For Windows builds, ensure the preprocessor definition ENGINE_EXPORTS is set
+  when building the engine library to properly export symbols.
+
+Copyright
+---------
+
+  Authors:
+   - Luca Mazza             (C) SUPSI [luca.mazza@supsi.ch]
+   - Vasco Silva Pereira    (C) SUPSI [vasco.silvapereira@supsi.ch]
+   - Roeld Hoxha            (C) SUPSI [roeld.hoxha@supsi.ch]
+
+  This is an educational project developed at SUPSI (Scuola Universitaria
+  Professionale della Svizzera Italiana).

@@ -48,7 +48,6 @@ std::shared_ptr<Camera> Engine::active_camera;
 std::string Engine::screen_text;
 int Engine::window_width = 0;
 int Engine::window_height = 0;
-glm::vec3 Engine::light_position = glm::vec3(0.0f, 20.0f, 0.0f);
 std::shared_ptr<Material> Engine::shadow_material = std::make_shared<Material>();
 
 int Engine::frames = 0;
@@ -119,7 +118,7 @@ bool ENG_API Engine::init(const std::string window_title, const int width, const
    glLightModelf(GL_LIGHT_MODEL_LOCAL_VIEWER, 1.0f);
    glLightModelfv(GL_LIGHT_MODEL_AMBIENT, glm::value_ptr(ambient));
    FreeImage_Initialise();
-   EMyngine::shadow_material->set_ambient_color(glm::vec3(0.0f, 0.0f, 0.0f));
+   Engine::shadow_material->set_ambient_color(glm::vec3(0.0f, 0.0f, 0.0f));
    Engine::shadow_material->set_diffuse_color(glm::vec3(0.0f, 0.0f, 0.0f));
    Engine::shadow_material->set_specular_color(glm::vec3(0.0f, 0.0f, 0.0f));
    Engine::shadow_material->set_shininess(0.0f);

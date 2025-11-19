@@ -237,24 +237,6 @@ void ENG_API Engine::set_keyboard_callback(void (*new_keyboard_callback) (const 
 }
 
 /**
- * Sets the shadow light position.
- *
- * @param position the new light position
- */
-void ENG_API Engine::set_shadow_light_position(const glm::vec3 position) {
-    Engine::light_position = position;
-}
-
-/**
- * Gets the shadow light position.
- *
- * @return the current light position
- */
-glm::vec3 ENG_API Engine::get_shadow_light_position() {
-    return Engine::light_position;
-}
-
-/**
  * Checks if the engine is running.
  *
  * @return true if the engine is running, false otherwise

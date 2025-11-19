@@ -40,8 +40,6 @@ public:
 	static void set_sky_color(const float red, const float green, const float blue);
     static void set_screen_text(const std::string text);
     static void set_keyboard_callback(void(*keyboard_callback)(const unsigned char key, const int mouse_x, const int mouse_y));
-    static void set_shadow_light_position(const glm::vec3 position);
-    static glm::vec3 get_shadow_light_position();
     static bool is_running();
     static void vsync_enable();
     static std::shared_ptr<Node> get_scene();
@@ -62,7 +60,6 @@ private:
 	static std::shared_ptr<Camera> active_camera;
     static std::shared_ptr<Material> shadow_material;
 	static std::string screen_text;
-	static glm::vec3 light_position;
 	static int frames;
 	static float fps;
 	static bool is_initialized_f;

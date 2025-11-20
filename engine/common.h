@@ -18,6 +18,14 @@
 #define BUILD_DATE          0
 #endif
 
+#define RED_FG              "\033[31m"
+#define GRN_FG              "\033[32m"
+#define YLW_FG              "\033[33m"
+#define BLU_FG              "\033[34m"
+#define MGN_FG              "\033[35m"
+#define CYN_FG              "\033[36m"
+#define RST_FG              "\033[0m"
+
 #ifdef __cplusplus
 extern "C" {
 #else
@@ -53,14 +61,14 @@ typedef unsigned char bool;
             abort();                                            \
         }                                                       \
     } while (0)
-#define DEBUG(fmt, ...)      fprintf(stderr, "DEBUG %s:%d:      " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__);
+#define DEBUG(fmt, ...)      fprintf(stdout, CYN_FG "DEBUG %20s:%4d: " fmt "\n" RST_FG, __FILE__, __LINE__, ##__VA_ARGS__);
 #else
 #define ASSERT(cond, msg)   ((void)0)
 #define DEBUG(fmt, ...)     ((void)0)
 #endif
-#define INFO(fmt, ...)      fprintf(stdout, "INFO:              " fmt "\n",                     ##__VA_ARGS__);
-#define WARN(fmt, ...)      fprintf(stderr, "WARNING %s:%d:     " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__);
-#define ERROR(fmt, ...)     fprintf(stderr, "ERROR %s:%d:       " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__);
+#define INFO(fmt, ...)      fprintf(stdout, MGN_FG "INFO %23s" fmt "\n" RST_FG, ##__VA_ARGS__);
+#define WARN(fmt, ...)      fprintf(stderr, YLW_FG "WARNING %18s:%4d: " fmt "\n" RST_FG, __FILE__, __LINE__, ##__VA_ARGS__);
+#define ERROR(fmt, ...)     fprintf(stderr, RED_FG "ERROR %20s:%4d: " fmt "\n" RST_FG, __FILE__, __LINE__, ##__VA_ARGS__);
 
 #if defined(__GNUC__) || defined(__clang__)
 #define LIKELY(x)           __builtin_expect(!!(x), 1)

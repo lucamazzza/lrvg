@@ -79,12 +79,12 @@ int main() {
         std::shared_ptr<lrvg::OrthoCamera> camera_1 = std::make_shared<lrvg::OrthoCamera>();
         camera_1->set_zoom(zoom);
         camera_1->set_name("Camera");
-        camera_1->set_position(glm::vec3(0.0f, 10.0f, 0.0f));
-        camera_1->set_rotation(glm::vec3(-90.0f, 0.0f, 0.0f));
+        camera_1->set_position(glm::vec3(-100.0f, 20.0f, 0.0f));
+        camera_1->set_rotation(glm::vec3(0.0f, -90.0f, 0.0f));
         std::shared_ptr<lrvg::PerspectiveCamera> camera_2 = std::make_shared<lrvg::PerspectiveCamera>();
         camera_2->set_name("Camera 2");
-        camera_2->set_position(glm::vec3(-100.0f, 30.0f, 0.0f));
-        camera_2->set_rotation(glm::vec3(0.0f, -90.0f, -10.0f));
+        camera_2->set_position(glm::vec3(-80.0f, 30.0f, 10.0f));
+        camera_2->set_rotation(glm::vec3(0.0f, -80.0f, -10.0f));
         saved_ortho_camera = camera_1;
         saved_persp_camera = camera_2;
     }

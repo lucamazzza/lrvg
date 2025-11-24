@@ -54,7 +54,7 @@ ifeq ($(shell uname -s),Darwin)
 else ifeq ($(OS),Windows_NT)
 	LIBS_GLFW   := ../dependencies/glfw/lib/glfw3.lib -lGL -ldl -lm -lpthread
 else
-	LIBS_GLFW   := ../dependencies/glfw/lib/libglfw3.a -lGL -ldl -lm -lpthread
+	LIBS_GLFW   := ../dependencies/glfw/lib/glfw3.a -lGL -ldl -lm -lpthread
 endif
 
 CFLAGS_FREEIMG 	:= -I../dependencies/freeimage/include

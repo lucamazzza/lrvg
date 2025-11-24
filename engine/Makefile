@@ -39,11 +39,11 @@ LDFLAGS_RELEASE = $(LDFLAGS)
 OBJDIR_RELEASE 	= obj/Release
 DEP_RELEASE 	= 
 ifeq ($(shell uname -s),Darwin)
-	OUT_RELEASE = ../bin/Debug/libengine.dylib
+	OUT_RELEASE = ../bin/Release/libengine.dylib
 else ifeq ($(OS),Windows_NT)
-	OUT_RELEASE = ../bin/Debug/engine.dll
+	OUT_RELEASE = ../bin/Release/engine.dll
 else
-	OUT_RELEASE = ../bin/Debug/libengine.so
+	OUT_RELEASE = ../bin/Release/libengine.so
 endif
 
 SOURCES 		:= $(wildcard *.cpp)

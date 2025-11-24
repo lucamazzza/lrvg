@@ -82,7 +82,7 @@ after_debug:
 debug: before_debug out_debug after_debug
 
 out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
-	$(LD) -shared $(LIBDIR_DEBUG) $(OBJ_DEBUG) -o $(OUT_DEBUG) $(LDFLAGS_DEBUG) $(LIB_DEBUG) $(LIBS_GLFW ) $(LIBS_FREEIMG)
+	$(LD) -shared $(LIBDIR_DEBUG) $(OBJ_DEBUG) -o $(OUT_DEBUG) $(LDFLAGS_DEBUG) $(LIB_DEBUG) $(LIBS_GLFW) $(LIBS_FREEIMG)
 
 $(OBJDIR_DEBUG)/%.o: %.cpp
 	@mkdir -p $(dir $@)
@@ -107,7 +107,7 @@ after_release:
 release: before_release out_release after_release
 
 out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
-	$(LD) -shared $(LIBDIR_RELEASE) $(OBJ_RELEASE) -o $(OUT_RELEASE) $(LDFLAGS_RELEASE) $(LIB_RELEASE) $(LIBS_GLFW ) $(LIBS_FREEIMG)
+	$(LD) -shared $(LIBDIR_RELEASE) $(OBJ_RELEASE) -o $(OUT_RELEASE) $(LDFLAGS_RELEASE) $(LIB_RELEASE) $(LIBS_GLFW) $(LIBS_FREEIMG)
 
 $(OBJDIR_RELEASE)/%.o: %.cpp
 	@mkdir -p $(dir $@)

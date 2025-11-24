@@ -1,0 +1,41 @@
+# Use a Docker image that supports C++20 (GCC 10+)
+image: gcc:latest
+
+variables:
+  # Prevent interactive prompts during package installation
+  DEBIAN_FRONTEND: noninteractive
+
+stages:
+  - build
+
+# Install system dependencies required before compiling
+before_script:
+  - apt-get update -qq
+  - apt-get install -y make
+  # Your engine links against -lGL, so we need OpenGL dev headers 
+  # Since you use GLFW, we also need X11 libraries typically required by GLFW on Linux
+  - apt-get install -y libgl1-mesa-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
+
+build_release:
+  stage: build
+  script:
+    # This runs the 'release' target in your root Makefile 
+    - make release
+  artifacts:
+    name: "release-build"
+    paths:
+      # Your Makefiles output binaries here [cite: 5, 2]
+      - bin/Release/
+    expire_in: 1 week
+
+build_debug:
+  stage: build
+  script:
+    # This runs the 'debug' target in your root Makefile 
+    - make debug
+  artifacts:
+    name: "debug-build"
+    paths:
+      # Your Makefiles output binaries here [cite: 5, 2]
+      - bin/Debug/
+    expire_in: 3 days

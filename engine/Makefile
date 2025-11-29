@@ -1,43 +1,43 @@
-CXX 			= g++
-AR 				= ar
-LD 				= g++
-WINDRES 		= windres
-BUILD_DATE 		= $(shell date +%Y%m%d)
+CXX             = g++
+AR              = ar
+LD              = g++
+WINDRES         = windres
+BUILD_DATE      = $(shell date +%Y%m%d)
 
-INC 			= -I../dependencies/glad/include -I../dependencies/glm/include -I../dependencies/freeimage/include
-CFLAGS 			= -Wall -std=c++20 -fPIC -m64 -fexceptions -DBUILD_DATE=$(BUILD_DATE)
-RCFLAGS 		= 
-RESINC 			= 
-LIBDIR 			= 
-LIB 			= 
-LDFLAGS 		= -m64
+INC             = -I../dependencies/glad/include -I../dependencies/glm/include -I../dependencies/freeimage/include
+CFLAGS          = -Wall -std=c++20 -fPIC -m64 -fexceptions -DBUILD_DATE=$(BUILD_DATE)
+RCFLAGS         = 
+RESINC          = 
+LIBDIR          = 
+LIB             = 
+LDFLAGS         = -m64
 
-INC_DEBUG 		= $(INC)
-CFLAGS_DEBUG 	= $(CFLAGS) -g -D_DEBUG
-RESINC_DEBUG 	= $(RESINC)
-RCFLAGS_DEBUG 	= $(RCFLAGS)
-LIBDIR_DEBUG 	= $(LIBDIR)
-LIB_DEBUG 		= $(LIB)
-LDFLAGS_DEBUG 	= $(LDFLAGS)
-OBJDIR_DEBUG 	= obj/Debug
-DEP_DEBUG 		= 
+INC_DEBUG       = $(INC)
+CFLAGS_DEBUG    = $(CFLAGS) -g -D_DEBUG
+RESINC_DEBUG    = $(RESINC)
+RCFLAGS_DEBUG   = $(RCFLAGS)
+LIBDIR_DEBUG    = $(LIBDIR)
+LIB_DEBUG       = $(LIB)
+LDFLAGS_DEBUG   = $(LDFLAGS)
+OBJDIR_DEBUG    = obj/Debug
+DEP_DEBUG       = 
 ifeq ($(shell uname -s),Darwin)
-	OUT_DEBUG 	= ../bin/Debug/libengine.dylib
+	OUT_DEBUG   = ../bin/Debug/libengine.dylib
 else ifeq ($(OS),Windows_NT)
-	OUT_DEBUG 	= ../bin/Debug/engine.dll
+	OUT_DEBUG   = ../bin/Debug/engine.dll
 else
-	OUT_DEBUG 	= ../bin/Debug/libengine.so
+	OUT_DEBUG   = ../bin/Debug/libengine.so
 endif
 
-INC_RELEASE 	= $(INC)
-CFLAGS_RELEASE 	= $(CFLAGS) -O2 -DNDEBUG
-RESINC_RELEASE 	= $(RESINC)
+INC_RELEASE     = $(INC)
+CFLAGS_RELEASE  = $(CFLAGS) -O2 -DNDEBUG
+RESINC_RELEASE  = $(RESINC)
 RCFLAGS_RELEASE = $(RCFLAGS)
-LIBDIR_RELEASE 	= $(LIBDIR)
-LIB_RELEASE 	= $(LIB)
+LIBDIR_RELEASE  = $(LIBDIR)
+LIB_RELEASE     = $(LIB)
 LDFLAGS_RELEASE = $(LDFLAGS)
-OBJDIR_RELEASE 	= obj/Release
-DEP_RELEASE 	= 
+OBJDIR_RELEASE  = obj/Release
+DEP_RELEASE     = 
 ifeq ($(shell uname -s),Darwin)
 	OUT_RELEASE = ../bin/Release/libengine.dylib
 else ifeq ($(OS),Windows_NT)
@@ -46,27 +46,31 @@ else
 	OUT_RELEASE = ../bin/Release/libengine.so
 endif
 
-SOURCES 		:= $(wildcard *.cpp)
+SOURCES         := $(wildcard *.cpp)
 
 PKG_CFLAGS_GLFW := -I../dependencies/glfw/include
 ifeq ($(shell uname -s),Darwin)
-	LIBS_GLFW 	:= ../dependencies/glfw/lib/glfw3.a -framework Cocoa -framework IOKit -framework CoreVideo -framework OpenGL
+	LIBS_GLFW   := ../dependencies/glfw/lib/macos/glfw3.a -framework Cocoa -framework IOKit -framework CoreVideo -framework OpenGL
 else ifeq ($(OS),Windows_NT)
-	LIBS_GLFW   := ../dependencies/glfw/lib/glfw3.lib -lGL -ldl -lm -lpthread
+	LIBS_GLFW   := ../dependencies/glfw/lib/win/glfw3.lib -lGL -ldl -lm -lpthread
 else
-	LIBS_GLFW   := ../dependencies/glfw/lib/glfw3.a -lGL -ldl -lm -lpthread
+	LIBS_GLFW   := ../dependencies/glfw/lib/lin/libglfw3.a -lGL -ldl -lm -lpthread
 endif
 
-CFLAGS_FREEIMG 	:= -I../dependencies/freeimage/include
-LIBS_FREEIMG  	:= ../dependencies/freeimage/lib/FreeImage.a
+CFLAGS_FREEIMG  := -I../dependencies/freeimage/include
+ifeq ($(shell uname -s),Darwin)
+	LIBS_FREEIMG := ../dependencies/freeimage/lib/macos/FreeImage.a
+else ifeq ($(OS),Windows_NT)
+	LIBS_FREEIMG := ../dependencies/freeimage/lib/win/FreeImage.lib
+else
+	LIBS_FREEIMG := ../dependencies/freeimage/lib/lin/libfreeimage.a
+endif
+GLAD_SRC        := ../dependencies/glad/src/glad.c
+OBJ_DEBUG       := $(patsubst %.cpp,$(OBJDIR_DEBUG)/%.o,$(SOURCES))
+OBJ_DEBUG       += $(OBJDIR_DEBUG)/glad.o
 
-GLAD_SRC 		:= ../dependencies/glad/src/glad.c
-
-OBJ_DEBUG 		:= $(patsubst %.cpp,$(OBJDIR_DEBUG)/%.o,$(SOURCES))
-OBJ_DEBUG 		+= $(OBJDIR_DEBUG)/glad.o
-
-OBJ_RELEASE 	:= $(patsubst %.cpp,$(OBJDIR_RELEASE)/%.o,$(SOURCES))
-OBJ_RELEASE 	+= $(OBJDIR_RELEASE)/glad.o
+OBJ_RELEASE     := $(patsubst %.cpp,$(OBJDIR_RELEASE)/%.o,$(SOURCES))
+OBJ_RELEASE     += $(OBJDIR_RELEASE)/glad.o
 
 .PHONY: all debug release clean before_debug after_debug before_release after_release
 

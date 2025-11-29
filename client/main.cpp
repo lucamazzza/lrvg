@@ -1,5 +1,5 @@
 /**
- * @file		main.cpp
+ * @file	main.cpp
  * @brief	Client application (that uses the graphics engine)
  *
  * @author	Luca Mazza (C) SUPSI [luca.mazza@supsi.ch]
@@ -7,7 +7,7 @@
  * @author	Roeld Hoxha (C) SUPSI [roeld.hoxha@supsi.ch]
  */
 
-#include "engine.h"
+#include <engine.h>
 #include <iostream>
 
 int main(int argc, char *argv[])
@@ -17,11 +17,7 @@ int main(int argc, char *argv[])
    std::cout << std::endl;
 
    // Init engine:
-   Eng::Base &eng = Eng::Base::getInstance();
-   eng.init();
-
-   // Release engine:
-   eng.free();
+   lrvg::Engine::init("Hanoi", 800, 600);
 
    // Done:
    std::cout << "\n[application terminated]" << std::endl;

@@ -1,66 +1,590 @@
 /**
- * @file		engine.cpp
- * @brief	Graphics engine main file
- *
- * @author	Luca Mazza (C) SUPSI [luca.mazza@supsi.ch]
- * @author	Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@supsi.ch]
- * @author	Roeld Hoxha (C) SUPSI [roeld.hoxha@supsi.ch]
+ * @file    engine.cpp
+ * @brief   Implementation of the Engine class for the 3D rendering engine.
+ * 
+ * This file contains the implementation of the Engine class, which is responsible for
+ * initializing and managing the rendering engine, handling the main loop, and rendering
+ * the scene. It integrates with GLFW for window management and input handling, and uses
+ * OpenGL for rendering.
+ * 
+ * @author	Luca Mazza          (C) SUPSI [luca.mazza@student.supsi.ch]
+ * @author	Roeld Hoxha         (C) SUPSI [roeld.hoxha@student.supsi.ch]
+ * @author	Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@student.supsi.ch]
  */
 
 #include "engine.h"
-   
-#include <iostream>   
+#include "common.h"
+#include "material.h"
+#include "mesh.h"
+
+#ifdef _WIN32
+#include <Windows.h>
+
+/**
+ * Windows DLL entry point.
+ * Called by the system when the DLL is loaded or unloaded.
+ * 
+ * @param hModule Handle to the DLL module
+ * @param ul_reason_for_call Reason for calling the function
+ * @param lpReserved Reserved parameter
+ * @return TRUE if successful
+ */
+BOOL APIENTRY DllMain(HMODULE hModule, DWORD  ul_reason_for_call, LPVOID lpReserved)
+{
+    switch (ul_reason_for_call)
+    {
+    case DLL_PROCESS_ATTACH:
+        break;
+    case DLL_PROCESS_DETACH:
+        break;
+    case DLL_THREAD_ATTACH:
+        break;
+    case DLL_THREAD_DETACH:
+        break;
+    }
+    return TRUE;
+}
+#endif 
+
+#include <algorithm>
+#include <cstdio>
+#include <memory>
+#include <string>
+#include <sstream>
+#include <utility>
+#include <vector>
+#include <iostream>
+#include <glad/gl.h>
+#include <GLFW/glfw3.h>
+#include <glm/gtc/type_ptr.hpp>
+#include <FreeImage/FreeImage.h>
+#include <FreeImage/stb_easy_font.h>
 #include <source_location>
 
-struct Eng::Base::Reserved
-{
-   bool initFlag;
-   Reserved() : initFlag{ false } 
-   {}
-};
+using namespace lrvg;
 
-ENG_API Eng::Base::Base() : reserved(std::make_unique<Eng::Base::Reserved>())
-{  
-#ifdef _DEBUG   
-   std::cout << "[+] " << std::source_location::current().function_name() << " invoked" << std::endl;
+// Static member initialization
+bool Engine::is_initialized_f = false;
+bool Engine::is_running_f = false;
+int Engine::window_id = 0;
+std::shared_ptr<Node> Engine::scene;
+std::shared_ptr<Camera> Engine::active_camera;
+std::string Engine::screen_text;
+std::string Engine::center_text;
+int Engine::window_width = 0;
+int Engine::window_height = 0;
+std::shared_ptr<Material> Engine::shadow_material = std::make_shared<Material>();
+
+int Engine::frames = 0;
+float Engine::fps = 0.0f;
+
+// Static local variables for GLFW integration
+static GLFWwindow* s_window = nullptr;
+static double s_last_fps_time = 0.0;
+static void (*s_keyboard_cb)(const unsigned char key, const int mouse_x, const int mouse_y) = nullptr;
+static void glfw_framebuffer_size_callback(GLFWwindow* window, int width, int height);
+static void glfw_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+/**
+ * Engine class destructor.
+ * Called when the engine singleton is destroyed.
+ */
+ENG_API Engine::~Engine() {
+#ifndef NDEBUG
+    DEBUG("%s invoked", std::source_location::current().function_name());
 #endif
 }
 
-ENG_API Eng::Base::~Base()
-{
-#ifdef _DEBUG
-   std::cout << "[-] " << std::source_location::current().function_name() << " invoked" << std::endl;
-#endif
-}
-
-Eng::Base ENG_API &Eng::Base::getInstance()
-{
-   static Base instance;
-   return instance;
-}
-
-bool ENG_API Eng::Base::init()
-{
-   if (reserved->initFlag)
-   {
-      std::cout << "ERROR: engine already initialized" << std::endl;
+/**
+ * Initializes the engine.
+ *
+ * @param window_title the title of the application window
+ * @param width the width of the application window
+ * @param height the height of the application window
+ * @return true if the engine was initialized successfully, false otherwise
+ */
+bool ENG_API Engine::init(const std::string window_title, const int width, const int height) {
+   if (UNLIKELY(Engine::is_initialized_f)) {
+      ERROR("engine already initialized");
       return false;
    }
-
-   std::cout << "[>] " << LIB_NAME << " initialized" << std::endl;
-   reserved->initFlag = true;
+   if (UNLIKELY(!glfwInit())) {
+       ERROR("Failed to initialize GLFW");
+       return false;
+   }
+   glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+   glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+   s_window = glfwCreateWindow(width, height, window_title.c_str(), nullptr, nullptr);
+   if (UNLIKELY(!s_window)) {
+       ERROR("Failed to create GLFW window");
+       glfwTerminate();
+       return false;
+   }
+   glfwMakeContextCurrent(s_window);
+   if (!gladLoadGL(glfwGetProcAddress)) {
+       ERROR("Failed to initialize GLAD");
+       glfwDestroyWindow(s_window);
+       glfwTerminate();
+       s_window = nullptr;
+       return false;
+   }
+   int fbw, fbh;
+   glfwGetFramebufferSize(s_window, &fbw, &fbh);
+   Engine::window_width = fbw;
+   Engine::window_height = fbh;
+   glViewport(0, 0, fbw, fbh);
+   glfwSetFramebufferSizeCallback(s_window, glfw_framebuffer_size_callback);
+   glfwSetKeyCallback(s_window, glfw_key_callback);
+   glEnable(GL_DEPTH_TEST);
+   glEnable(GL_NORMALIZE);
+   glEnable(GL_LIGHTING);
+   glEnable(GL_CULL_FACE);
+   glLightModeli(GL_LIGHT_MODEL_TWO_SIDE, GL_TRUE);
+   const glm::vec4 ambient(0.2f, 0.2f, 0.2f, 1.0f);
+   glLightModelf(GL_LIGHT_MODEL_LOCAL_VIEWER, 1.0f);
+   glLightModelfv(GL_LIGHT_MODEL_AMBIENT, glm::value_ptr(ambient));
+   FreeImage_Initialise();
+   Engine::shadow_material->set_ambient_color(glm::vec3(0.0f, 0.0f, 0.0f));
+   Engine::shadow_material->set_diffuse_color(glm::vec3(0.0f, 0.0f, 0.0f));
+   Engine::shadow_material->set_specular_color(glm::vec3(0.0f, 0.0f, 0.0f));
+   Engine::shadow_material->set_shininess(0.0f);
+   DEBUG("%s initialized", LIB_NAME);
+   Engine::is_initialized_f = true;
+   Engine::is_running_f = true;
+   s_last_fps_time = glfwGetTime();
+   Engine::frames = 0;
+   Engine::fps = 0.0f;
    return true;
 }
 
-bool ENG_API Eng::Base::free()
-{
-   if (!reserved->initFlag)
-   {
-      std::cout << "ERROR: engine not initialized" << std::endl;
+/**
+ * Frees the engine resources.
+ *
+ * @return true if the engine was freed successfully, false otherwise
+ */
+bool ENG_API Engine::free() {
+   if (UNLIKELY(!Engine::is_initialized_f)) {
+      ERROR("engine not initialized");
       return false;
    }
-
-   std::cout << "[<] " << LIB_NAME << " deinitialized" << std::endl;
-   reserved->initFlag = false;
+   FreeImage_DeInitialise();
+   if (LIKELY(s_window)) {
+       glfwDestroyWindow(s_window);
+       s_window = nullptr;
+   }
+   glfwTerminate();
+   DEBUG("%s.%d deinitialized", LIB_VERSION_STRING, BUILD_DATE);
+   Engine::is_initialized_f = false;
+   Engine::is_running_f = false;
    return true;
+}
+
+/**
+ * GLFW framebuffer size callback.
+ * This function is called whenever the window is resized.
+ *
+ * @param width the new width of the framebuffer
+ * @param height the new height of the framebuffer
+ */
+void ENG_API Engine::resize_callback(const int width, const int height) {
+    Engine::window_width = width;
+	Engine::window_height = height;
+	DEBUG("Window resized to %dx%d", width, height);
+    if (UNLIKELY(Engine::active_camera != nullptr)) {
+        Engine::active_camera->set_window_size(Engine::window_width, Engine::window_height);
+	}
+	glViewport(0, 0, width, height);
+}
+
+/**
+ * GLFW timer callback.
+ * This function is called whenever the timer expires.
+ *
+ * @param val the timer value
+ */
+void ENG_API Engine::timer_callback(int val) {
+    (void)val; 
+}
+
+/**
+ * Sets the active camera.
+ *
+ * @param camera the camera to set as active
+ */
+void ENG_API Engine::set_active_camera(const std::shared_ptr<Camera> camera) {
+    if (Engine::active_camera != nullptr) {
+		Engine::active_camera->set_active(false);
+    }
+	camera->set_window_size(Engine::window_width, Engine::window_height);
+	camera->set_active(true);
+    Engine::active_camera = camera;
+}
+
+/**
+ * Sets the scene.
+ *
+ * @param scene the root node of the scene to set
+ */
+void ENG_API Engine::set_scene(const std::shared_ptr<Node> scene) {
+    Engine::scene = scene;
+	Engine::active_camera = nullptr;
+}
+
+/**
+ * Sets the sky color.
+ *
+ * @param red the red component of the sky color
+ * @param green the green component of the sky color
+ * @param blue the blue component of the sky color
+ */
+void ENG_API Engine::set_sky_color(const float red, const float green, const float blue) {
+    glClearColor(red, green, blue, 1.0f);
+}
+
+/**
+ * Sets the screen text.
+ *
+ * @param text the text to display on the screen
+ */
+void ENG_API Engine::set_screen_text(const std::string text) {
+    Engine::screen_text = text;
+}
+
+/**
+ * Sets the center text (for big notifications like victory).
+ *
+ * @param text the text to display in the center of the screen
+ */
+void ENG_API Engine::set_center_text(const std::string text) {
+    Engine::center_text = text;
+}
+
+/**
+ * Sets the keyboard callback function.
+ *
+ * @param new_keyboard_callback the new keyboard callback function
+ */
+void ENG_API Engine::set_keyboard_callback(void (*new_keyboard_callback) (const unsigned char key, const int mouse_x, const int mouse_y)) {
+    s_keyboard_cb = new_keyboard_callback;
+    if (LIKELY(s_window)) {
+        glfwSetKeyCallback(s_window, glfw_key_callback);
+    }
+}
+
+/**
+ * Checks if the engine is running.
+ *
+ * @return true if the engine is running, false otherwise
+ */
+bool ENG_API Engine::is_running() {
+   if (UNLIKELY(!Engine::is_initialized_f)) {
+      ERROR("engine not initialized");
+      return false;
+   }
+   glfwPollEvents();
+   if (s_window && glfwWindowShouldClose(s_window)) {
+       Engine::is_running_f = false;
+   }
+   return Engine::is_running_f;
+}
+
+/**
+ * Enables vertical synchronization (VSync).
+ */
+void ENG_API Engine::vsync_enable() {
+    if (LIKELY(s_window)) {
+        glfwSwapInterval(1);
+    }
+}
+
+/**
+ * Gets the scene.
+ *
+ * @return the root node of the current scene
+ */
+std::shared_ptr<Node> ENG_API Engine::get_scene() {
+    return Engine::scene;
+}
+
+/**
+ * Gets the window size.
+ *
+ * @param width reference to store the window width
+ * @param height reference to store the window height
+ */
+void ENG_API Engine::get_window_size(int &width, int &height) {
+    width = Engine::window_width;
+    height = Engine::window_height;
+}
+
+/**
+ * Updates the engine state.
+ */
+void ENG_API Engine::update() {
+    if (UNLIKELY(!Engine::is_initialized_f)) {
+       ERROR("engine not initialized");
+       return;
+    }
+    glfwPollEvents();
+    double now = glfwGetTime();
+    if (s_last_fps_time <= 0.0) s_last_fps_time = now;
+    if (now - s_last_fps_time >= 1.0) {
+        Engine::fps = (float)Engine::frames;
+        Engine::frames = 0;
+        s_last_fps_time = now;
+    }
+}
+
+/**
+ * Clears the screen.
+ */
+void ENG_API Engine::clear_screen() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+/**
+ * Renders the scene.
+ */
+void ENG_API Engine::render() {
+    if (UNLIKELY(Engine::scene == nullptr || Engine::active_camera == nullptr)) {
+        ERROR("scene or active camera not set");
+        return;
+	}
+	Engine::active_camera->set_window_size(Engine::window_width, Engine::window_height);
+    int max_lights;
+	glGetIntegerv(GL_MAX_LIGHTS, &max_lights);
+	for (int i = 0; i < max_lights; i++) {
+	    glDisable(GL_LIGHT0 + i);
+	}
+    auto render_list = Engine::build_render_list(Engine::scene, glm::mat4(1.0f));
+    std::sort(
+        render_list.begin(),
+        render_list.end(),
+        [](
+            const std::pair<std::shared_ptr<Object>, glm::mat4> a,
+            const std::pair<std::shared_ptr<Object>, glm::mat4> b
+        ) {
+            return a.first->get_priority() > b.first->get_priority();
+        }
+    );
+    
+    const glm::mat4 inv_camera_matrix = glm::inverse(Engine::active_camera->get_local_matrix());
+    
+    // Render scene normally
+    for (const auto& node : render_list) {
+        node.first->render(inv_camera_matrix * node.second);
+    }
+    // Shadow rendering
+    glDepthFunc(GL_LEQUAL);
+    const glm::mat4 shadow_model_scale_matrix = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f, 0.05f, 1.0f));
+    for (const auto& node : render_list) {
+        std::shared_ptr<Mesh> mesh = std::dynamic_pointer_cast<Mesh>(node.first);
+        if (mesh != nullptr && mesh->get_cast_shadows()) {
+            glm::mat4 shadow_world_matrix = node.second;
+            shadow_world_matrix[3][1] = 0.01f;
+            const std::shared_ptr<Material> original_material = mesh->get_material();
+            mesh->set_material(Engine::shadow_material);
+            const glm::mat4 shadow_matrix = shadow_model_scale_matrix * shadow_world_matrix;
+            mesh->render(inv_camera_matrix * shadow_matrix);
+            mesh->set_material(original_material);
+        }
+    }
+    glDepthFunc(GL_LESS);
+
+    std::stringstream fps;
+    fps << Engine::fps << " fps";
+    Engine::draw_text_overlay(
+            Engine::window_width, 
+            Engine::window_height, 
+            fps.str().c_str(), 
+            10.0f, 
+            1.0f,
+            0.0f, 1.0f, 0.0f
+    );
+    if (!Engine::screen_text.empty()) {
+        int line_count = 1;
+        for (char c : Engine::screen_text) {
+            if (c == '\n') line_count++;
+        }
+        const float line_height = 10.0f;
+        const float bottom_padding = 10.0f;
+        float y = (float)Engine::window_height - bottom_padding - line_height * (line_count + 1);
+        Engine::draw_text_overlay(
+                Engine::window_width, 
+                Engine::window_height,
+                Engine::screen_text.c_str(), 
+                10.0f, 
+                y, 
+                1.0f, 1.0f, 1.0f
+        );
+    }
+    if (!Engine::center_text.empty()) {
+        const float scale = 8.0f;
+        const float char_width = 6.0f * scale;
+        const float char_height = 10.0f * scale;
+        float text_width = Engine::center_text.length() * char_width;
+        float x = ((float)Engine::window_width - text_width) * 0.5f;
+        float y = ((float)Engine::window_height - char_height) * 0.5f;
+        Engine::draw_text_overlay(
+                Engine::window_width, 
+                Engine::window_height,
+                Engine::center_text.c_str(), 
+                x, 
+                y, 
+                1.0f, 0.5f, 0.1f,
+                scale
+        );
+    }
+    Engine::frames++;
+}
+
+/**
+ * Swaps the front and back buffers.
+ */
+void ENG_API Engine::swap_buffers() {
+    if (LIKELY(s_window)) {
+        glfwSwapBuffers(s_window);
+    }
+}
+
+/**
+ * Finds an object by name in the scene.
+ *
+ * @param name the name of the object to find
+ * @return a shared pointer to the found object, or nullptr if not found
+ */
+std::shared_ptr<Object> ENG_API Engine::find_obj_by_name(const std::string name) {
+	const auto obj = Engine::find_obj_by_name(name, Engine::scene);
+    if (obj == nullptr) {
+        WARN("object %s not found", name.c_str());
+	}
+	return obj;
+}
+
+/**
+ * Draws text overlay on the screen.
+ *
+ * @param fb_width the width of the framebuffer
+ * @param fb_height the height of the framebuffer
+ * @param text the text to draw
+ * @param x the x position of the text
+ * @param y the y position of the text
+ * @param r the red component of the text color
+ * @param g the green component of the text color
+ * @param b the blue component of the text color
+ * @param scale the scale factor for the text
+ */
+void ENG_API Engine::draw_text_overlay(int fb_width, int fb_height, const char *text, float x, float y, float r, float g, float b, float scale) {
+    if (UNLIKELY(!text)) return;
+    static std::vector<char> vbuf(1 << 16);
+    int __width = stb_easy_font_width((char*)text);
+    int __height = stb_easy_font_height((char*)text);
+    UNUSED(__width); UNUSED(__height);
+    stb_easy_font_spacing(1.0f);
+    int num_quads = stb_easy_font_print((float)x, (float)y, (char*)text, NULL, vbuf.data(), (int)vbuf.size());
+    if (UNLIKELY(num_quads <= 0)) return;
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glDepthFunc(GL_LESS);
+    glPushAttrib(GL_ENABLE_BIT | GL_CURRENT_BIT | GL_TRANSFORM_BIT);
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glm::mat4 ortho = glm::ortho(0.0f, (float)fb_width, (float)fb_height, 0.0f, -1.0f, 1.0f);
+    glLoadMatrixf(glm::value_ptr(ortho));
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+    glLoadIdentity();
+    glTranslatef(x, y, 0.0f);
+    glScalef(scale, scale, 1.0f);
+    glDisable(GL_DEPTH_TEST);
+    glDisable(GL_CULL_FACE);
+    glDisable(GL_LIGHTING);
+    glDisable(GL_TEXTURE_2D);
+    glPixelZoom(1.0f, 1.0f);
+    glColor3f(r, g, b);
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glVertexPointer(2, GL_FLOAT, 16, vbuf.data());
+    glDrawArrays(GL_QUADS, 0, num_quads * 4);
+    glDisableClientState(GL_VERTEX_ARRAY);
+    glPopMatrix();
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glPopAttrib();
+    glMatrixMode(GL_MODELVIEW);
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_LIGHTING);
+    glEnable(GL_TEXTURE_2D);
+}
+
+/**
+ * Builds a flat render list from the scene graph hierarchy.
+ * Recursively traverses the scene graph and computes world transformation matrices.
+ * 
+ * @param scene_root Root node to start traversal
+ * @param parent_world_matrix Parent's world transformation matrix
+ * @return Vector of node-matrix pairs ready for rendering
+ */
+std::vector<std::pair<std::shared_ptr<Node>, glm::mat4>> Engine::build_render_list(
+        const std::shared_ptr<Node> scene_root, 
+        const glm::mat4 parent_world_matrix
+        ) {
+    std::vector<std::pair<std::shared_ptr<Node>, glm::mat4>> render_list;
+    render_list.push_back(std::make_pair(scene_root, parent_world_matrix * scene_root->get_local_matrix()));
+    for (const auto& child : scene_root->get_children()) {
+		std::vector<std::pair<std::shared_ptr<Node>, glm::mat4>> child_render_list = 
+            Engine::build_render_list(child, parent_world_matrix * scene_root->get_local_matrix());
+		render_list.insert(render_list.end(), child_render_list.begin(), child_render_list.end());
+    }
+    return render_list;
+}
+
+/**
+ * Recursively searches for an object by name in the scene graph.
+ * 
+ * @param name Object name to search for
+ * @param root Root node to start the search from
+ * @return Shared pointer to the found object, or nullptr if not found
+ */
+std::shared_ptr<Object> Engine::find_obj_by_name(const std::string name, const std::shared_ptr<Node> root) {
+    for (const auto& child : root->get_children()) {
+        if (child->get_name() == name) {
+            return child;
+        }
+		const auto found = Engine::find_obj_by_name(name, child);
+        if (found != nullptr) {
+            return found;
+		}
+    }
+	return nullptr;
+}
+
+/**
+ * GLFW framebuffer resize callback wrapper.
+ * 
+ * @param window GLFW window handle
+ * @param width New framebuffer width
+ * @param height New framebuffer height
+ */
+static void glfw_framebuffer_size_callback(GLFWwindow* /*window*/, int width, int height) {
+    Engine::resize_callback(width, height);
+}
+
+/**
+ * GLFW keyboard callback wrapper.
+ * Converts GLFW key events to the engine's keyboard callback format.
+ * 
+ * @param window GLFW window handle
+ * @param key GLFW key code
+ * @param scancode Platform-specific scancode
+ * @param action Key action (press, release, repeat)
+ * @param mods Modifier keys state
+ */
+static void glfw_key_callback(GLFWwindow* /*window*/, int key, int /*scancode*/, int action, int /*mods*/) {
+    if (UNLIKELY(action != GLFW_PRESS)) return;
+    if (UNLIKELY(!s_keyboard_cb)) return;
+    const char* name = glfwGetKeyName(key, 0);
+    unsigned char ascii = (name && name[0]) ? (unsigned char)name[0] : (unsigned char)key;
+    double xpos = 0.0, ypos = 0.0;
+    if (LIKELY(s_window)) glfwGetCursorPos(s_window, &xpos, &ypos);
+    s_keyboard_cb(ascii, (int)xpos, (int)ypos);
 }

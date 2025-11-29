@@ -1,50 +1,79 @@
 /**
- * @file		engine.h
+ * @file    engine.h
  * @brief	Graphics engine main include file
  *
- * @author	Luca Mazza (C) SUPSI [luca.mazza@supsi.ch]
- * @author	Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@supsi.ch]
- * @author	Roeld Hoxha (C) SUPSI [roeld.hoxha@supsi.ch]
+ * This file serves as the main include for the LRVG graphics engine.
+ * It includes all necessary headers and definitions required to use the engine.
+ *
+ * @author	Luca Mazza (C) SUPSI            [luca.mazza@student.supsi.ch]
+ * @author	Roeld Hoxha (C) SUPSI           [roeld.hoxha@student.supsi.ch]
+ * @author	Vasco Silva Pereira (C) SUPSI   [vasco.silvapereira@student.supsi.ch]
  */
 
 #pragma once
-       
+
 #include <memory> 
+#include <string>
+#include <vector>
 
-#ifdef _DEBUG
-   #define LIB_NAME      "My Graphics Engine v0.1a (debug)"   
-#else
-   #define LIB_NAME      "My Graphics Engine v0.1a"   
-#endif
-   #define LIB_VERSION   10                 
+#include <glm/glm.hpp>
 
-#ifdef _WINDOWS
-   #ifdef ENGINE_EXPORTS
-      #define ENG_API __declspec(dllexport)
-   #else
-      #define ENG_API __declspec(dllimport)
-   #endif      
+#include "common.h"
+#include "object.h"
+#include "node.h"
+#include "camera.h"
+#include "material.h"
 
-   #pragma warning(disable : 4251) 
-#else
-   #define ENG_API
-#endif
+namespace lrvg {
 
-namespace Eng {
-   class ENG_API Base final
-   {
-   public: 
-      Base(Base const &) = delete;
-      ~Base();
-      void operator=(Base const &) = delete;
-      static Base &getInstance();
-      bool init();
-      bool free();   
+/**
+ * @brief Base engine main class. This class is a singleton.
+ *
+ * The Engine class manages the overall state and functionality of the graphics engine.
+ * It provides methods for initialization, scene management, rendering, and input handling.
+ * The class is designed as a singleton to ensure a single instance throughout the application.
+ */
+class ENG_API Engine final {
+public: 
+	Engine(Engine const &) = delete;
+    void operator=(Engine const &) = delete;
+    ~Engine();
+	static bool init(const std::string window_title, const int window_width, const int window_height);
+    static bool free();
+    static void resize_callback(const int width, const int height);
+    static void timer_callback(int val);
+    static void set_active_camera(const std::shared_ptr<Camera> camera);
+    static void set_scene(const std::shared_ptr<Node> scene);
+	static void set_sky_color(const float red, const float green, const float blue);
+    static void set_screen_text(const std::string text);
+    static void set_center_text(const std::string text);
+    static void set_keyboard_callback(void(*keyboard_callback)(const unsigned char key, const int mouse_x, const int mouse_y));
+    static bool is_running();
+    static void vsync_enable();
+    static std::shared_ptr<Node> get_scene();
+    static void get_window_size(int& width, int& height);
+    static void update();
+    static void clear_screen();
+    static void render();
+	static void swap_buffers();
+	static std::shared_ptr<Object> find_obj_by_name(const std::string name);
+    static void draw_text_overlay(int fb_width, int fb_height, const char* text, float x, float y, float r, float g, float b, float scale = 1.0f);
+private: 
+	static std::vector<std::pair<std::shared_ptr<Node>, glm::mat4>> build_render_list(const std::shared_ptr<Node>, const glm::mat4 par_world_matrix);
+	static std::shared_ptr<Object> find_obj_by_name(const std::string name, const std::shared_ptr<Node> root);
+	static int window_id;
+	static int window_width;
+	static int window_height;
+	static std::shared_ptr<Node> scene;
+	static std::shared_ptr<Camera> active_camera;
+    static std::shared_ptr<Material> shadow_material;
+	static std::string screen_text;
+	static std::string center_text;
+	static int frames;
+	static float fps;
+	static bool is_initialized_f;
+	static bool is_running_f;
+	Engine();
+};
 
-   private:
-      struct Reserved;
-      std::unique_ptr<Reserved> reserved;
-      Base();
-   };
-}; 
-
+}

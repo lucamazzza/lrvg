@@ -481,7 +481,7 @@ void ENG_API Engine::draw_text_overlay(int fb_width, int fb_height, const char *
     int __height = stb_easy_font_height((char*)text);
     UNUSED(__width); UNUSED(__height);
     stb_easy_font_spacing(1.0f);
-    int num_quads = stb_easy_font_print((float)x, (float)y, (char*)text, NULL, vbuf.data(), (int)vbuf.size());
+    int num_quads = stb_easy_font_print(0.0f, 0.0f, (char*)text, NULL, vbuf.data(), (int)vbuf.size());
     if (UNLIKELY(num_quads <= 0)) return;
     glClear(GL_DEPTH_BUFFER_BIT);
     glDepthFunc(GL_LESS);

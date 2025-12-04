@@ -57,7 +57,10 @@ if [ ! -d "freeimage" ]; then
 fi
 
 cd freeimage
-make -j$NPROC -f Makefile.gnu
+
+# Compile FreeImage with C++14 to avoid C++17 compatibility issues
+echo "Building FreeImage with C++14..."
+CXXFLAGS="-O3 -fPIC -fexceptions -fvisibility=hidden -Wno-ctor-dtor-privacy -std=c++14" make -j$NPROC -f Makefile.gnu
 
 mkdir -p "$DEPS_DIR/freeimage/lib/lin"
 cp Dist/libfreeimage.a "$DEPS_DIR/freeimage/lib/lin/libfreeimage.a"

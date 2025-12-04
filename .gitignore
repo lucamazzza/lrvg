@@ -391,3 +391,4 @@ FodyWeavers.xsd
 ### NON Visual Studio ###
 compile_commands.json
 engine/docs/
+.deps_build/

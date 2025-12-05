@@ -16,7 +16,7 @@ before_script:
 build_release:
   stage: build
   script:
-    - make release
+    - CI=true make release
   artifacts:
     name: "release-build"
     paths:
@@ -26,7 +26,7 @@ build_release:
 build_debug:
   stage: build
   script:
-    - make debug
+    - CI=true make debug
   artifacts:
     name: "debug-build"
     paths:

@@ -392,3 +392,5 @@ FodyWeavers.xsd
 compile_commands.json
 engine/docs/
 .deps_build/
+dependencies/freeimage/lib/gitlab/
+dependencies/glfw/lib/gitlab/

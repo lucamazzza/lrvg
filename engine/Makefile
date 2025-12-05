@@ -53,6 +53,8 @@ ifeq ($(shell uname -s),Darwin)
 	LIBS_GLFW   := ../dependencies/glfw/lib/macos/glfw3.a -framework Cocoa -framework IOKit -framework CoreVideo -framework OpenGL
 else ifeq ($(OS),Windows_NT)
 	LIBS_GLFW   := ../dependencies/glfw/lib/win/glfw3.lib -lGL -ldl -lm -lpthread
+else ifdef CI
+	LIBS_GLFW   := ../dependencies/glfw/lib/gitlab/libglfw3.a -lGL -ldl -lm -lpthread
 else
 	LIBS_GLFW   := ../dependencies/glfw/lib/lin/libglfw3.a -lGL -ldl -lm -lpthread
 endif
@@ -62,6 +64,8 @@ ifeq ($(shell uname -s),Darwin)
 	LIBS_FREEIMG := ../dependencies/freeimage/lib/macos/FreeImage.a
 else ifeq ($(OS),Windows_NT)
 	LIBS_FREEIMG := ../dependencies/freeimage/lib/win/FreeImage.lib
+else ifdef CI
+	LIBS_FREEIMG := ../dependencies/freeimage/lib/gitlab/libfreeimage.a
 else
 	LIBS_FREEIMG := ../dependencies/freeimage/lib/lin/libfreeimage.a
 endif

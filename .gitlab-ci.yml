@@ -4,6 +4,7 @@ variables:
   DEBIAN_FRONTEND: noninteractive
 
 stages:
+  - dependencies
   - build
 
 before_script:
@@ -11,10 +12,24 @@ before_script:
   - apt-get install -y make cmake unzip curl
   - apt-get install -y libgl1-mesa-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
 
-build_release:
-  stage: build
+build_dependencies:
+  stage: dependencies
   script:
     - ./scripts/build_dependencies.sh
+  cache:
+    key: dependencies-v1
+    paths:
+      - dependencies/
+  artifacts:
+    paths:
+      - dependencies/
+    expire_in: 1 week
+
+build_release:
+  stage: build
+  dependencies:
+    - build_dependencies
+  script:
     - make release
   artifacts:
     name: "release-build"
@@ -24,8 +39,9 @@ build_release:
 
 build_debug:
   stage: build
+  dependencies:
+    - build_dependencies
   script:
-    - ./scripts/build_dependencies.sh
     - make debug
   artifacts:
     name: "debug-build"

@@ -65,7 +65,7 @@ ifeq ($(shell uname -s),Darwin)
 else ifeq ($(OS),Windows_NT)
 	LIBS_FREEIMG := ../dependencies/freeimage/lib/win/FreeImage.lib
 else ifdef CI
-	LIBS_FREEIMG := ../dependencies/freeimage/lib/gitlab/libfreeimage.a
+	LIBS_FREEIMG := ../dependencies/freeimage/lib/gitlab/libfreeimage.a -ljpeg -lpng -ltiff -lwebp -lwebpmux -lwebpdemux -lIlmImf-3_1 -lImath-3_1 -lIex-3_1 -lraw -lopenjp2 -ljxrglue -ljpegxr -lz
 else
 	LIBS_FREEIMG := ../dependencies/freeimage/lib/lin/libfreeimage.a
 endif

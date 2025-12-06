@@ -8,22 +8,28 @@ BUILD_DIR="$PROJECT_ROOT/.deps_build"
 
 echo "Setting up dependencies for Linux CI..."
 
-# Create GitLab-specific directory structure
-mkdir -p "$DEPS_DIR/freeimage/lib/gitlab"
-mkdir -p "$DEPS_DIR/glfw/lib/gitlab"
+# Create CI-specific directory structure
+mkdir -p "$DEPS_DIR/freeimage/lib/ci"
+mkdir -p "$DEPS_DIR/glfw/lib/ci"
 
 # Install FreeImage from system packages (much faster than building)
 echo "===================================="
 echo "Using system FreeImage package..."
 echo "===================================="
 
-# Create symlinks to system libraries in gitlab subfolder
+# Create symlinks to system libraries in ci subfolder
+# Detect architecture-specific library path
+ARCH=$(dpkg --print-architecture 2>/dev/null || uname -m)
 if [ -f /usr/lib/x86_64-linux-gnu/libfreeimage.a ]; then
-    ln -sf /usr/lib/x86_64-linux-gnu/libfreeimage.a "$DEPS_DIR/freeimage/lib/gitlab/libfreeimage.a"
+    ln -sf /usr/lib/x86_64-linux-gnu/libfreeimage.a "$DEPS_DIR/freeimage/lib/ci/libfreeimage.a"
+elif [ -f /usr/lib/aarch64-linux-gnu/libfreeimage.a ]; then
+    ln -sf /usr/lib/aarch64-linux-gnu/libfreeimage.a "$DEPS_DIR/freeimage/lib/ci/libfreeimage.a"
+elif [ -f /usr/lib/arm-linux-gnueabihf/libfreeimage.a ]; then
+    ln -sf /usr/lib/arm-linux-gnueabihf/libfreeimage.a "$DEPS_DIR/freeimage/lib/ci/libfreeimage.a"
 elif [ -f /usr/lib/libfreeimage.a ]; then
-    ln -sf /usr/lib/libfreeimage.a "$DEPS_DIR/freeimage/lib/gitlab/libfreeimage.a"
+    ln -sf /usr/lib/libfreeimage.a "$DEPS_DIR/freeimage/lib/ci/libfreeimage.a"
 else
-    echo "Warning: libfreeimage.a not found"
+    echo "Warning: libfreeimage.a not found (searched for $ARCH architecture)"
     exit 1
 fi
 
@@ -58,7 +64,7 @@ cmake .. \
 
 make -j$(nproc)
 
-cp src/libglfw3.a "$DEPS_DIR/glfw/lib/gitlab/libglfw3.a"
+cp src/libglfw3.a "$DEPS_DIR/glfw/lib/ci/libglfw3.a"
 echo "GLFW built successfully!"
 
 echo "===================================="

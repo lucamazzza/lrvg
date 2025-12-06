@@ -54,7 +54,7 @@ ifeq ($(shell uname -s),Darwin)
 else ifeq ($(OS),Windows_NT)
 	LIBS_GLFW   := ../dependencies/glfw/lib/win/glfw3.lib -lGL -ldl -lm -lpthread
 else ifdef CI
-	LIBS_GLFW   := ../dependencies/glfw/lib/gitlab/libglfw3.a -lGL -ldl -lm -lpthread
+	LIBS_GLFW   := ../dependencies/glfw/lib/ci/libglfw3.a -lGL -ldl -lm -lpthread
 else
 	LIBS_GLFW   := ../dependencies/glfw/lib/lin/libglfw3.a -lGL -ldl -lm -lpthread
 endif
@@ -65,7 +65,7 @@ ifeq ($(shell uname -s),Darwin)
 else ifeq ($(OS),Windows_NT)
 	LIBS_FREEIMG := ../dependencies/freeimage/lib/win/FreeImage.lib
 else ifdef CI
-	LIBS_FREEIMG := ../dependencies/freeimage/lib/gitlab/libfreeimage.a -ljpeg -lpng -ltiff -lwebp -lwebpmux -lwebpdemux -lOpenEXR-3_1 -lImath-3_1 -lIex-3_1 -lraw_r -lopenjp2 -lz
+	LIBS_FREEIMG := ../dependencies/freeimage/lib/ci/libfreeimage.a -ljpeg -lpng -ltiff -lwebp -lwebpmux -lwebpdemux -lOpenEXR-3_1 -lImath-3_1 -lIex-3_1 -lraw_r -lopenjp2 -ljxrglue -lz
 else
 	LIBS_FREEIMG := ../dependencies/freeimage/lib/lin/libfreeimage.a
 endif

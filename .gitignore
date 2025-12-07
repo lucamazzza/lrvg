@@ -394,3 +394,4 @@ engine/docs/
 .deps_build/
 dependencies/freeimage/lib/gitlab/
 dependencies/glfw/lib/gitlab/
+test_ci_locally.sh

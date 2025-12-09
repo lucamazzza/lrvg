@@ -1,41 +1,41 @@
-CXX = g++
-AR = ar
-LD = g++
-WINDRES = windres
+CXX             = g++
+AR              = ar
+LD              = g++
+WINDRES         = windres
 
-INC = -I../engine -I../dependencies/glm/include -I../dependencies/glad/include -I../dependencies/freeimage/include -I/opt/homebrew/include
-CFLAGS = -Wall -std=c++20 -fexceptions
-RCFLAGS = 
-RESINC = 
-LIBDIR = 
-LIB = -lengine
-LDFLAGS = 
+INC             = -I../engine -I../dependencies/glm/include -I../dependencies/glad/include -I../dependencies/freeimage/include -I/opt/homebrew/include
+CFLAGS          = -Wall -std=c++20 -fexceptions
+RCFLAGS         = 
+RESINC          = 
+LIBDIR          = 
+LIB             = -lengine
+LDFLAGS         = 
 
-INC_DEBUG = $(INC)
-CFLAGS_DEBUG = $(CFLAGS) -g -D_DEBUG
-RESINC_DEBUG = $(RESINC)
-RCFLAGS_DEBUG = $(RCFLAGS)
-LIBDIR_DEBUG = $(LIBDIR) -L../bin/Debug
-LIB_DEBUG = $(LIB)
-LDFLAGS_DEBUG = $(LDFLAGS)
-OBJDIR_DEBUG = obj/Debug
-DEP_DEBUG =
-OUT_DEBUG = bin/Debug/client
+INC_DEBUG       = $(INC)
+CFLAGS_DEBUG    = $(CFLAGS) -g -D_DEBUG
+RESINC_DEBUG    = $(RESINC)
+RCFLAGS_DEBUG   = $(RCFLAGS)
+LIBDIR_DEBUG    = $(LIBDIR) -L../bin/Debug
+LIB_DEBUG       = $(LIB)
+LDFLAGS_DEBUG   = $(LDFLAGS)
+OBJDIR_DEBUG    = obj/Debug
+DEP_DEBUG       =
+OUT_DEBUG       = bin/Debug/client
 
-INC_RELEASE = $(INC)
-CFLAGS_RELEASE = $(CFLAGS) -O2
-RESINC_RELEASE = $(RESINC)
+INC_RELEASE     = $(INC)
+CFLAGS_RELEASE  = $(CFLAGS) -O2
+RESINC_RELEASE  = $(RESINC)
 RCFLAGS_RELEASE = $(RCFLAGS)
-LIBDIR_RELEASE = $(LIBDIR) -L../bin/Release
-LIB_RELEASE = $(LIB)
+LIBDIR_RELEASE  = $(LIBDIR) -L../bin/Release
+LIB_RELEASE     = $(LIB)
 LDFLAGS_RELEASE = $(LDFLAGS)
-OBJDIR_RELEASE = obj/Release
-DEP_RELEASE = 
-OUT_RELEASE = bin/Release/client
+OBJDIR_RELEASE  = obj/Release
+DEP_RELEASE     = 
+OUT_RELEASE     = bin/Release/client
 
-OBJ_DEBUG = $(OBJDIR_DEBUG)/main.o
+OBJ_DEBUG       = $(OBJDIR_DEBUG)/main.o $(OBJDIR_DEBUG)/hanoi_game.o $(OBJDIR_DEBUG)/game_controller.o
 
-OBJ_RELEASE = $(OBJDIR_RELEASE)/main.o
+OBJ_RELEASE     = $(OBJDIR_RELEASE)/main.o $(OBJDIR_RELEASE)/hanoi_game.o $(OBJDIR_RELEASE)/game_controller.o
 
 all: debug release
 
@@ -55,6 +55,12 @@ out_debug: before_debug $(OBJ_DEBUG) $(DEP_DEBUG)
 $(OBJDIR_DEBUG)/main.o: main.cpp
 	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c main.cpp -o $(OBJDIR_DEBUG)/main.o
 
+$(OBJDIR_DEBUG)/hanoi_game.o: hanoi_game.cpp hanoi_game.h
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c hanoi_game.cpp -o $(OBJDIR_DEBUG)/hanoi_game.o
+
+$(OBJDIR_DEBUG)/game_controller.o: game_controller.cpp game_controller.h hanoi_game.h
+	$(CXX) $(CFLAGS_DEBUG) $(INC_DEBUG) -c game_controller.cpp -o $(OBJDIR_DEBUG)/game_controller.o
+
 clean_debug: 
 	rm -f $(OBJ_DEBUG) $(OUT_DEBUG)
 	rm -rf bin/Debug
@@ -73,6 +79,12 @@ out_release: before_release $(OBJ_RELEASE) $(DEP_RELEASE)
 
 $(OBJDIR_RELEASE)/main.o: main.cpp
 	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c main.cpp -o $(OBJDIR_RELEASE)/main.o
+
+$(OBJDIR_RELEASE)/hanoi_game.o: hanoi_game.cpp hanoi_game.h
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c hanoi_game.cpp -o $(OBJDIR_RELEASE)/hanoi_game.o
+
+$(OBJDIR_RELEASE)/game_controller.o: game_controller.cpp game_controller.h hanoi_game.h
+	$(CXX) $(CFLAGS_RELEASE) $(INC_RELEASE) -c game_controller.cpp -o $(OBJDIR_RELEASE)/game_controller.o
 
 clean_release: 
 	rm -f $(OBJ_RELEASE) $(OUT_RELEASE)

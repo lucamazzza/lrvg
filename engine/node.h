@@ -35,6 +35,7 @@ public:
     void set_rotation(const glm::vec3 rotation);
     void set_scale(const glm::vec3 scale);
 	void render(const glm::mat4 world_matrix) const override;
+	bool remove_child(const std::shared_ptr<Node> child);
 protected:
 	std::vector<std::shared_ptr<Node>> children;
 private:

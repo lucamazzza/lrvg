@@ -1,5 +1,7 @@
 #include "node.h"
 
+#include <algorithm>
+
 #include <glad/gl.h>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -147,3 +149,13 @@ void ENG_API Node::render(const glm::mat4 world_matrix) const {
 	glMatrixMode(GL_MODELVIEW);
 	glLoadMatrixf(glm::value_ptr(world_matrix));
 }
+
+ENG_API bool Node::remove_child(const std::shared_ptr<Node> child) {
+	auto it = std::find(children.begin(), children.end(), child);
+	if (it != children.end()) {
+		children.erase(it);
+		return true;
+	}
+	return false;
+}
+

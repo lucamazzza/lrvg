@@ -38,8 +38,16 @@ Documentation
    - camera.h               Camera base class
    - perspective_camera.h   Perspective projection camera
    - ortho_camera.h         Orthographic projection camera
+   - light.h                Scene light
+   - directional_light.h    Infinite light
+   - point_light.h          Omnidirectional light
+   - spot_light.h           Spotlight
    - node.h                 Scene graph node
    - object.h               Renderable object
+   - ovo_parser.h           3D file reader for OVO
+   - mesh.h                 Object shapes
+   - material.h             Material applied to meshes
+   - texture.h              Images applied to materials
 
 Installation
 ------------
@@ -53,6 +61,7 @@ Installation
    - "make build_engine" builds only the engine library
    - "make build_client" builds only the client (requires engine)
    - "make clean" removes all build artifacts
+   - "make test" executes unit tests for the engine module
 
   The Makefile at the top level will invoke the appropriate makefiles in
   the engine/ and client/ subdirectories.

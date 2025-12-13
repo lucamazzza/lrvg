@@ -203,11 +203,11 @@ void mesh_cast_shadows_test() {
     INFO("Testing Mesh Shadow Casting");
     const std::shared_ptr<Mesh> mesh = std::make_shared<Mesh>();
     
-    ASSERT(mesh->get_cast_shadows() == true, "Mesh should cast shadows by default");
-    mesh->set_cast_shadows(false);
-    ASSERT(mesh->get_cast_shadows() == false, "Mesh should not cast shadows after setting to false");
+    ASSERT(mesh->get_cast_shadows() == false, "Mesh should not cast shadows by default");
     mesh->set_cast_shadows(true);
     ASSERT(mesh->get_cast_shadows() == true, "Mesh should cast shadows after setting to true");
+    mesh->set_cast_shadows(false);
+    ASSERT(mesh->get_cast_shadows() == false, "Mesh should not cast shadows after setting false");
     SUCCESS("Mesh Shadow Casting Test Passed");
 }
 

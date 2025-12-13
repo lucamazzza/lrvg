@@ -1,7 +1,13 @@
 /**
- * @file	directional_light.h
+ * @file	directional_light.cpp
  * @brief	Directional light class implementation
  *
+ * This file contains the implementation of the DirectionalLight class, which represents a directional light source
+ * in a 3D rendering engine. A directional light simulates light coming from a specific direction,
+ * similar to sunlight, affecting all objects in the scene uniformly.
+ * The DirectionalLight class inherits from the Light base class and provides methods to set the direction
+ * of the light and to render the light's effect on the scene.
+ * 
  * @author	Luca Mazza i        (C) SUPSI [luca.mazza@student.supsi.ch]
  * @author	Roeld Hoxha         (C) SUPSI [roeld.hoxha@student.supsi.ch]
  * @author	Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@student.supsi.ch]

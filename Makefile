@@ -32,4 +32,7 @@ clean_engine:
 clean_client: 
 	$(MAKE) -C client clean
 
-.PHONY: clean_engine clean_client
+test: build_engine_debug
+	$(MAKE) -C engine test
+
+.PHONY: clean_engine clean_client test

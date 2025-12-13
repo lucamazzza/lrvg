@@ -2,6 +2,12 @@
  * @file	spot_light.cpp
  * @brief	Spot light class implementation
  *
+ * This file contains the implementation of the SpotLight class, which represents a spot light source in a 3D scene.
+ * A spot light emits a cone of light in a specific direction, similar to a flashlight.
+ * The SpotLight class inherits from the Light class and provides methods to set the light's direction
+ * and properties such as cutoff angle, exponent, and radius.
+ * It also includes a render method to apply the spotlight effect in the scene.
+ *
  * @author	Luca Mazza          (C) SUPSI [luca.mazza@student.supsi.ch]
  * @author	Roeld Hoxha         (C) SUPSI [roeld.hoxha@student.supsi.ch]
  * @author	Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@student.supsi.ch]

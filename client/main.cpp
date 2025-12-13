@@ -25,8 +25,21 @@
 
 std::shared_ptr<lrvg::PerspectiveCamera>    saved_persp_camera = nullptr;
 std::shared_ptr<lrvg::OrthoCamera>          saved_ortho_camera = nullptr;
+std::shared_ptr<lrvg::Node>                 saved_light = nullptr;
 float                                       zoom = 300.0f;
 GameController*                             controller = nullptr;
+float                                       camera_angle = 0.0f;
+float                                       light_angle = 0.0f;
+
+void move_light() {
+    if (saved_light) {
+        light_angle += 1.0f; // Increment angle (degrees per frame)
+        float radius = 80.0f; // Circle radius
+        float rad = glm::radians(light_angle);
+        glm::vec3 new_pos(radius * sin(rad), 0.0f, radius * cos(rad));
+        saved_light->set_position(new_pos);
+    }
+}
 
 /**
  * Application entry point.
@@ -47,10 +60,11 @@ int main() {
     lrvg::Engine::set_screen_text(
             "LRVG Engine - Hanoi Tower" 
             "\n[1-3]  Select Tower (source then target)"
-            "\n[A]    Auto-solve"
+            "\n[S]    Auto-solve"
             "\n[R]    Restart game"
             "\n[P]    Perspective camera"
             "\n[O]    Ortho camera"
+            "\n[A/D]  Rotate camera"
             "\n[J]    Zoom - (ortho)"
             "\n[K]    Zoom + (ortho)");
 
@@ -60,7 +74,7 @@ int main() {
                 case '1': case '2': case '3':
                     controller->handle_tower_selection(key - '1');
                     break;
-                case 'a': case 'A':
+                case 's': case 'S':
                     controller->autosolve();
                     break;
                 case 'o': case 'O':
@@ -86,6 +100,26 @@ int main() {
                 case 'r': case 'R':
                     controller->reset_game();
                     break;
+                case 'a': case 'A':
+                    if (saved_persp_camera) {
+                        camera_angle -= 5.0f;
+                        float radius = 100.0f;
+                        float rad = glm::radians(camera_angle);
+                        glm::vec3 new_pos(radius * sin(rad), 30.0f, radius * cos(rad));
+                        saved_persp_camera->set_position(new_pos);
+                        saved_persp_camera->set_rotation(glm::vec3(0.0f, camera_angle, 0.0f));
+                    }
+                    break;
+                case 'd': case 'D':
+                    if (saved_persp_camera) {
+                        camera_angle += 5.0f;
+                        float radius = 100.0f;
+                        float rad = glm::radians(camera_angle);
+                        glm::vec3 new_pos(radius * sin(rad), 30.0f, radius * cos(rad));
+                        saved_persp_camera->set_position(new_pos);
+                        saved_persp_camera->set_rotation(glm::vec3(0.0f, camera_angle, 0.0f));
+                    }
+                    break;
             }
     });
 
@@ -99,8 +133,8 @@ int main() {
         camera_1->set_rotation(glm::vec3(0.0f, -90.0f, 0.0f));
         std::shared_ptr<lrvg::PerspectiveCamera> camera_2 = std::make_shared<lrvg::PerspectiveCamera>();
         camera_2->set_name("Camera 2");
-        camera_2->set_position(glm::vec3(-80.0f, 30.0f, 10.0f));
-        camera_2->set_rotation(glm::vec3(0.0f, -80.0f, -10.0f));
+        camera_2->set_position(glm::vec3(0.0f, 30.0f, 100.0f));
+        camera_2->set_rotation(glm::vec3(0.0f, 0.0f, 0.0f));
         saved_ortho_camera = camera_1;
         saved_persp_camera = camera_2;
     }
@@ -108,14 +142,20 @@ int main() {
     root->add_child(saved_persp_camera);
     lrvg::Engine::set_scene(root);
     lrvg::Engine::set_active_camera(saved_persp_camera);
-    auto base = std::static_pointer_cast<lrvg::Mesh>(lrvg::Engine::find_obj_by_name("Table"));
-    if (base) base->set_cast_shadows(false);
+    // Shadow Enable
+    auto board = std::dynamic_pointer_cast<lrvg::Mesh>(lrvg::Engine::find_obj_by_name("Board"));
+    if (board) board->set_cast_shadows(true);
     controller->init_scene_nodes();
+    // Moving lights
+    saved_light = std::static_pointer_cast<lrvg::Node>(lrvg::Engine::find_obj_by_name("MovingLight"));
+    auto omni = std::dynamic_pointer_cast<lrvg::PointLight>(lrvg::Engine::find_obj_by_name("Omni001"));
+    omni->set_radius(.6f);
 
     // Main loop
     while (LIKELY(lrvg::Engine::is_running())) {
+        // NOTE: For Autosolver timing consistency
         controller->update(0.016f);
-        
+        move_light();
         lrvg::Engine::update();
         lrvg::Engine::clear_screen();
         lrvg::Engine::render();

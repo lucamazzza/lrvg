@@ -1,6 +1,13 @@
 /**
  * @file	object.h
- * @brief	Object class implementation
+ * @brief	Object class definition
+ *
+ * This file contains the definition of the Object class, which serves as the base class for all objects in the scene.
+ * It provides a unique identifier (ID) and a name for each object.
+ * The class also defines virtual methods for retrieving the local transformation matrix,
+ * getting the rendering priority, and rendering the object.
+ * Derived classes must implement the render method to define their specific rendering behavior.
+ * This class is essential for managing and organizing objects within the graphics engine.
  *
  * @author	Luca Mazza          (C) SUPSI [luca.mazza@student.supsi.ch]
  * @author	Roeld Hoxha         (C) SUPSI [roeld.hoxha@student.supsi.ch]
@@ -19,6 +26,13 @@ namespace lrvg {
 
 /**
  * @brief Base class for all scene objects.
+ *
+ * The Object class serves as the base class for all objects in the scene.
+ * It provides a unique identifier (ID) and a name for each object.
+ * The class also defines virtual methods for retrieving the local transformation matrix,
+ * getting the rendering priority, and rendering the object.
+ * Derived classes must implement the render method to define their specific rendering behavior.
+ * This class is essential for managing and organizing objects within the graphics engine.
  */
 class ENG_API Object {
 public:

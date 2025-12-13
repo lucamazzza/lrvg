@@ -2,6 +2,12 @@
  * @file	camera.cpp
  * @brief	Camera node class implementation
  * 
+ * This file contains the implementation of the Camera class, which represents a camera node in a 3D scene graph.
+ * A camera defines the point of view from which the scene is rendered.
+ * The Camera class provides methods to set the field of view (FOV), clipping planes,
+ * window size, and active state of the camera.
+ * It also defines a method to retrieve the rendering priority of the camera.
+ *
  * @author	Luca Mazza          (C) SUPSI [luca.mazza@student.supsi.ch]
  * @author	Roeld Hoxha         (C) SUPSI [roeld.hoxha@student.supsi.ch]
  * @author	Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@student.supsi.ch]

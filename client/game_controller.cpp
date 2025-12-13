@@ -1,13 +1,24 @@
 /**
  * @file	game_controller.cpp
  * @brief	Game controller implementation
+ *
+ * This file implements the GameController class, which manages user input,
+ * game state, and interactions with the HanoiGame logic.
+ *
+ * @author  Luca Mazza          (C) SUPSI [luca.mazza@student.supsi.ch]
+ * @author  Roeld Hoxha         (C) SUPSI [roeld.hoxha@student.supsi.ch]
+ * @author  Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@student.supsi.ch]
  */
 
 #include "game_controller.h"
 #include <engine.h>
 #include <mesh.h>
-#include <thread>
 
+/**
+ * Constructs a GameController with the specified number of disks
+ *
+ * @param num_disks	Number of disks in the Tower of Hanoi game
+ */
 GameController::GameController(int num_disks) : game(num_disks), selected_tower(-1),
     current_move(0), move_timer(0.0f), is_autosolving(false) {
     disk_nodes[0] = nullptr;
@@ -29,6 +40,9 @@ GameController::GameController(int num_disks) : game(num_disks), selected_tower(
     disk_original_parents[6] = nullptr;
 }
 
+/**
+ * Initializes scene nodes for disks and pins
+ */
 void GameController::init_scene_nodes() {
     disk_nodes[0] = std::dynamic_pointer_cast<lrvg::Node>(lrvg::Engine::find_obj_by_name("Disk1"));
     disk_nodes[1] = std::dynamic_pointer_cast<lrvg::Node>(lrvg::Engine::find_obj_by_name("Disk2"));
@@ -64,6 +78,12 @@ void GameController::init_scene_nodes() {
     update_disk_hierarchy();
 }
 
+
+/**
+ * Removes a disk from its current parent node
+ *
+ * @param disk_id ID of the disk to remove
+ */
 void GameController::remove_disk_from_current_parent(int disk_id) {
     if (!disk_nodes[disk_id]) return;
     
@@ -89,6 +109,12 @@ void GameController::remove_disk_from_current_parent(int disk_id) {
     disk_nodes[disk_id]->set_scale(glm::vec3(1.0f, 1.0f, 1.0f));
 }
 
+/**
+ * Highlights or unhighlights a disk
+ *
+ * @param disk_id ID of the disk to highlight/unhighlight
+ * @param highlight	True to highlight, false to unhighlight
+ */
 void GameController::highlight_disk(int disk_id, bool highlight) {
     if (!disk_nodes[disk_id]) return;
     auto mesh = static_pointer_cast<lrvg::Mesh>(disk_nodes[disk_id]);
@@ -100,6 +126,9 @@ void GameController::highlight_disk(int disk_id, bool highlight) {
     }
 }
 
+/**
+ * Updates the hierarchy of disks based on the game state
+ */
 void GameController::update_disk_hierarchy() {
     for (int disk_id = 0; disk_id < 7; disk_id++) {
         remove_disk_from_current_parent(disk_id);
@@ -120,6 +149,11 @@ void GameController::update_disk_hierarchy() {
     }
 }
 
+/**
+ * Handles tower selection and disk movement
+ *
+ * @param tower	Index of the selected tower
+ */
 void GameController::handle_tower_selection(int tower) {
     if (selected_tower == -1) {
         if (!game.is_tower_empty(tower)) {
@@ -146,6 +180,9 @@ void GameController::handle_tower_selection(int tower) {
     }
 }
 
+/**
+ * Resets the game to the initial state
+ */
 void GameController::reset_game() {
     game.reset();
     selected_tower = -1;
@@ -153,10 +190,18 @@ void GameController::reset_game() {
     lrvg::Engine::set_center_text("");
 }
 
+/**
+ * Checks if the game has been won
+ *
+ * @return True if the game is won, false otherwise
+ */
 bool GameController::check_victory() const {
     return game.is_victory();
 }
 
+/**
+ * Automatically solves the Tower of Hanoi puzzle
+ */
 void GameController::autosolve() {
     reset_game();
     solve_moves.clear();
@@ -180,6 +225,11 @@ void GameController::autosolve() {
     is_autosolving = true;
 }
 
+/**
+ * Updates the game state for automatic solving
+ *
+ * @param dt Time delta since last update
+ */
 void GameController::update(float dt) {
     if (!is_autosolving) return;
     

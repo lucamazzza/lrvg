@@ -17,8 +17,6 @@
 #include <glad/gl.h>
 #include <glm/glm.hpp>
 
-#include "mesh.h"
-
 using namespace lrvg;
 
 /**

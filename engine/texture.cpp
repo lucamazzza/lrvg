@@ -2,6 +2,10 @@
  * @file	texture.cpp
  * @brief	Texture object class
  *
+ * This file contains the definition of the Texture class, which represents a texture in a 3D rendering engine.
+ * It provides functionality to load an image from a file and create an OpenGL texture.
+ * The class includes methods to render the texture using a world transformation matrix.
+ *
  * @author	Luca Mazza          (C) SUPSI [luca.mazza@student.supsi.ch]
  * @author	Roeld Hoxha         (C) SUPSI [roeld.hoxha@student.supsi.ch]
  * @author	Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@student.supsi.ch]

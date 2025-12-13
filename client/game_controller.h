@@ -1,15 +1,28 @@
 /**
  * @file	game_controller.h
  * @brief	Game controller for handling input and state
+ *
+ * This file defines the GameController class, which manages user input,
+ * game state, and interactions with the HanoiGame logic.
+ *
+ * @author	Luca Mazza          (C) SUPSI [luca.mazza@student.supsi.ch]
+ * @author	Roeld Hoxha         (C) SUPSI [roeld.hoxha@student.supsi.ch]
+ * @author	Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@student.supsi.ch]
  */
-
-#ifndef GAME_CONTROLLER_H
-#define GAME_CONTROLLER_H
+#pragma once
 
 #include "hanoi_game.h"
 #include <memory>
 #include <node.h>
 
+/**
+ * @class	GameController
+ * @brief	Handles user input and game state for Tower of Hanoi
+ *
+ * The GameController class manages the interaction between the user and the
+ * HanoiGame logic. It processes tower selections, resets the game, checks for
+ * victory conditions, and can automatically solve the puzzle.
+ */
 class GameController {
 private:
     HanoiGame game;
@@ -37,5 +50,3 @@ public:
     void autosolve();
     void update(float dt);
 };
-
-#endif

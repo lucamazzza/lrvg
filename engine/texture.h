@@ -2,6 +2,10 @@
  * @file	texture.h
  * @brief	Texture object class
  *
+ * This file contains the definition of the Texture class, which represents a texture in a 3D rendering engine.
+ * It provides functionality to load an image from a file and create an OpenGL texture.
+ * The class includes methods to render the texture using a world transformation matrix.
+ *
  * @author	Luca Mazza          (C) SUPSI [luca.mazza@student.supsi.ch]
  * @author	Roeld Hoxha         (C) SUPSI [roeld.hoxha@student.supsi.ch]
  * @author	Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@student.supsi.ch]
@@ -23,13 +27,24 @@
 #include  <string>
 
 namespace lrvg {
-	class ENG_API Texture : public Object {
-	public:	
-		Texture(const std::string path);
-		~Texture();
-		void render(const glm::mat4 world_matrix) const override;
-	private:
-		void* bitmap;
-		unsigned int texture_id;
-	};
+
+/**
+ * @brief Texture object class.
+ *
+ * The Texture class represents a texture in a 3D rendering engine.
+ * It provides functionality to load an image from a file and create an OpenGL texture.
+ * The class includes methods to render the texture using a world transformation matrix.
+ *
+ * @see Object
+ */
+class ENG_API Texture : public Object {
+public:	
+    Texture(const std::string path);
+    ~Texture();
+    void render(const glm::mat4 world_matrix) const override;
+private:
+    void* bitmap;
+    unsigned int texture_id;
+};
+
 }

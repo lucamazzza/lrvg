@@ -2,6 +2,12 @@
  * @file	camera.h
  * @brief	Camera node class definition
  *
+ * This file contains the definition of the Camera class, which represents a camera node in a 3D scene graph.
+ * A camera defines the point of view from which the scene is rendered.
+ * The Camera class provides methods to set the field of view (FOV), clipping planes,
+ * window size, and active state of the camera.
+ * It also defines a method to retrieve the rendering priority of the camera.
+ *
  * @author	Luca Mazza          (C) SUPSI [luca.mazza@student.supsi.ch]
  * @author	Roeld Hoxha         (C) SUPSI [roeld.hoxha@student.supsi.ch]
  * @author	Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@student.supsi.ch]
@@ -18,6 +24,14 @@ namespace lrvg {
 
 /**
  * @brief Camera node base class. A camera defines the point of view from which the scene is rendered.
+ *
+ * The Camera class is an abstract base class that inherits from Node.
+ * It provides common functionality for different types of cameras, such as perspective and orthographic cameras.
+ * The class manages properties like field of view (FOV), clipping planes, window size,
+ * and active state. It also defines a pure virtual render method that must be implemented by derived classes.
+ * Cameras are essential for rendering scenes from specific viewpoints in 3D graphics applications.
+ *
+ * @see Node
  */
 class ENG_API Camera : public Node {
 public:

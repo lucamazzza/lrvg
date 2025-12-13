@@ -2,6 +2,11 @@
  * @file	ortho_camera.cpp
  * @brief   Orthographic camera class implementation
  *
+ * This file contains the implementation of the OrthoCamera class, which represents an orthographic camera
+ * in a 3D rendering engine. An orthographic camera provides a parallel projection, where objects maintain their size
+ * regardless of distance from the camera. This type of camera is commonly used in 2D games, architectural visualization,
+ * and technical drawings.
+ *
  * @author	Luca Mazza          (C) SUPSI [luca.mazza@student.supsi.ch]
  * @author	Roeld Hoxha         (C) SUPSI [roeld.hoxha@student.supsi.ch]
  * @author	Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@student.supsi.ch]

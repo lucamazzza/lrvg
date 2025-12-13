@@ -4,13 +4,20 @@ LD              = g++
 WINDRES         = windres
 BUILD_DATE      = $(shell date +%Y%m%d)
 
+# Check architecture - only add -m64 on x86_64
+ARCH            = $(shell uname -m)
+M64_FLAG        = 
+ifeq ($(ARCH),x86_64)
+	M64_FLAG    = -m64
+endif
+
 INC             = -I../dependencies/glad/include -I../dependencies/glm/include -I../dependencies/freeimage/include
-CFLAGS          = -Wall -std=c++20 -fPIC -m64 -fexceptions -DBUILD_DATE=$(BUILD_DATE)
+CFLAGS          = -Wall -std=c++20 -fPIC $(M64_FLAG) -fexceptions -DBUILD_DATE=$(BUILD_DATE)
 RCFLAGS         = 
 RESINC          = 
 LIBDIR          = 
 LIB             = 
-LDFLAGS         = -m64
+LDFLAGS         = $(M64_FLAG)
 
 INC_DEBUG       = $(INC)
 CFLAGS_DEBUG    = $(CFLAGS) -g -D_DEBUG
@@ -46,7 +53,7 @@ else
 	OUT_RELEASE = ../bin/Release/libengine.so
 endif
 
-SOURCES         := $(wildcard *.cpp)
+SOURCES         := $(filter-out engine_test.cpp, $(wildcard *.cpp))
 
 PKG_CFLAGS_GLFW := -I../dependencies/glfw/include
 ifeq ($(shell uname -s),Darwin)
@@ -76,9 +83,13 @@ OBJ_DEBUG       += $(OBJDIR_DEBUG)/glad.o
 OBJ_RELEASE     := $(patsubst %.cpp,$(OBJDIR_RELEASE)/%.o,$(SOURCES))
 OBJ_RELEASE     += $(OBJDIR_RELEASE)/glad.o
 
-.PHONY: all debug release clean before_debug after_debug before_release after_release
+.PHONY: all debug release clean before_debug after_debug before_release after_release test
 
-all: debug release
+all: test debug release
+
+test: out_debug
+	$(CXX) -o $(OBJDIR_DEBUG)/engine_test engine_test.cpp $(INC_DEBUG) $(PKG_CFLAGS_GLFW) $(CFLAGS_FREEIMG) $(LIBDIR_DEBUG) -L../bin/Debug -lengine $(LDFLAGS_DEBUG) $(LIB_DEBUG) $(LIBS_GLFW) $(LIBS_FREEIMG) -Wl,-rpath,../bin/Debug
+	./$(OBJDIR_DEBUG)/engine_test
 
 before_debug: 
 	test -d bin/Debug || mkdir -p bin/Debug

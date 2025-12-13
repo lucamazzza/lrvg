@@ -4,6 +4,7 @@ variables:
   DEBIAN_FRONTEND: noninteractive
 
 stages:
+  - test
   - build
 
 before_script:
@@ -12,6 +13,21 @@ before_script:
   - apt-get install -y libgl1-mesa-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
   - apt-get install -y libfreeimage-dev libglfw3-dev libjpeg-dev libpng-dev libtiff-dev libwebp-dev libopenexr-dev libraw-dev libopenjp2-7-dev zlib1g-dev libjxr-dev
   - ./scripts/build_dependencies.sh
+
+test:
+  stage: test
+  cache:
+    key: glfw-build
+    paths:
+      - .deps_build/glfw/
+  script:
+    - CI=true make test
+  artifacts:
+    name: "test-results"
+    paths:
+      - engine/obj/Debug/engine_test
+    expire_in: 1 week
+    when: always
 
 build_release:
   stage: build

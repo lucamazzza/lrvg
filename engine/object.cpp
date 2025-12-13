@@ -1,3 +1,19 @@
+/**
+ * @file	object.cpp
+ * @brief	Object class implementation
+ *
+ * This file contains the implementation of the Object class, which serves as the base class for all objects in the scene.
+ * It provides a unique identifier (ID) and a name for each object.
+ * The class also implements virtual methods for retrieving the local transformation matrix,
+ * getting the rendering priority, and rendering the object.
+ * Derived classes must implement the render method to define their specific rendering behavior.
+ * This class is essential for managing and organizing objects within the graphics engine.
+ *
+ * @author	Luca Mazza          (C) SUPSI [luca.mazza@student.supsi.ch]
+ * @author	Roeld Hoxha         (C) SUPSI [roeld.hoxha@student.supsi.ch]
+ * @author	Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@student.supsi.ch]
+ */
+
 #include "object.h"
 
 #include <sstream>

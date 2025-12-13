@@ -13,9 +13,9 @@ mkdir -p "$DEPS_DIR/freeimage/lib/ci"
 mkdir -p "$DEPS_DIR/glfw/lib/ci"
 
 # Install FreeImage from system packages (much faster than building)
-echo "===================================="
+echo "================================="
 echo "Using system FreeImage package..."
-echo "===================================="
+echo "================================="
 
 # Create symlinks to system libraries in ci subfolder
 # Detect architecture-specific library path
@@ -67,6 +67,6 @@ make -j$(nproc)
 cp src/libglfw3.a "$DEPS_DIR/glfw/lib/ci/libglfw3.a"
 echo "GLFW built successfully!"
 
-echo "===================================="
+echo "====================================="
 echo "All dependencies set up successfully!"
-echo "===================================="
+echo "====================================="

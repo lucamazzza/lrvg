@@ -2,6 +2,11 @@
  * @file	perspective_camera.cpp
  * @brief   Perspective camera class implementation
  *
+ * This file contains the implementation of the PerspectiveCamera class, which represents a perspective camera 
+ * in a 3D rendering engine. A perspective camera simulates the way the human eye perceives the world,
+ * with objects appearing smaller as they are farther from the camera. This type of camera is commonly used
+ * in 3D games and simulations to create a realistic sense of depth.
+ *
  * @author	Luca Mazza          (C) SUPSI [luca.mazza@student.supsi.ch]
  * @author	Roeld Hoxha         (C) SUPSI [roeld.hoxha@student.supsi.ch]
  * @author	Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@student.supsi.ch]

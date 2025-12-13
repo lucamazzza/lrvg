@@ -2,6 +2,10 @@
  * @file    mesh.cpp
  * @brief   Mesh class implementation
  *
+ * This file contains the implementation of the Mesh class, which represents a 3D mesh
+ * in a rendering engine. The Mesh class allows setting and retrieving the material,
+ * mesh data (vertices, faces, normals, UVs), and rendering the mesh using OpenGL.
+ *
  * @author	Luca Mazza          (C) SUPSI [luca.mazza@student.supsi.ch]
  * @author	Roeld Hoxha         (C) SUPSI [roeld.hoxha@student.supsi.ch]
  * @author	Vasco Silva Pereira (C) SUPSI [vasco.silvapereira@student.supsi.ch]
@@ -26,7 +30,7 @@ using namespace lrvg;
  */
 ENG_API Mesh::Mesh() {
    this->set_material(std::make_shared<Material>());
-   this->set_cast_shadows(true);
+   this->set_cast_shadows(false);
 }
 
 /**

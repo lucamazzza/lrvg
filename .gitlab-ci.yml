@@ -6,6 +6,7 @@ variables:
 stages:
   - test
   - build
+  - package
 
 before_script:
   - apt-get update -qq
@@ -37,12 +38,10 @@ build_release:
       - .deps_build/glfw/
   script:
     - CI=true make release
-    - tar -czf lrvg-release.tar.gz -C bin/Release libengine.so -C ../../client/bin/Release client
   artifacts:
     name: "release-build"
     paths:
       - bin/Release/
-      - lrvg-release.tar.gz
     expire_in: 1 week
 
 build_debug:
@@ -53,10 +52,27 @@ build_debug:
       - .deps_build/glfw/
   script:
     - CI=true make debug
-    - tar -czf lrvg-debug.tar.gz -C bin/Debug libengine.so -C ../../client/bin/Debug client
   artifacts:
     name: "debug-build"
     paths:
       - bin/Debug/
-      - lrvg-debug.tar.gz
     expire_in: 3 days
+
+package:
+  stage: package
+  cache:
+    key: glfw-build
+    paths:
+      - .deps_build/glfw/
+  script:
+    - apt-get install -y patchelf
+    - CI=true make package
+  artifacts:
+    name: "hanoi-package-$CI_COMMIT_SHORT_SHA"
+    paths:
+      - build/hanoi.tar.gz
+    expire_in: 30 days
+  only:
+    - main
+    - master
+    - tags
